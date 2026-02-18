@@ -1,2 +1,1 @@
-# Bovine_Corpus_Luteum_Scientific_data_R_script
-Bovine_Corpus_Luteum_Scientific_data_R_script
+The R code used for proteomics data evaluation for the paper " Bovine Corpus Luteum Proteomics during Different Reproductive and Physiological Stages" by Granit Thaqi, et al. (2026). Please read the paper for more information.
