@@ -857,7 +857,7 @@ scale_color_manual(values = c("Cumulative" = "#008000",  # vivid green
 "Shared" = "black")) +  # vivid orange
 labs(
 y = "Number of proteins",
-x = NULL,
+x = "Time points",
 title = NULL
 ) +
 scale_x_discrete(labels = sample_names) +
@@ -946,7 +946,7 @@ position = position_jitter(width = 0.10),
 size = 3.5, shape = 21, stroke = 1.2,
 color = "black", fill = "white") +
 scale_fill_manual(values = group_colors) +
-labs(x = NULL, y = "Number of identified proteins", title = NULL) +
+labs(x = "Time points", y = "Number of proteins", title = NULL) +
 scale_y_continuous(expand = c(0, 0), limits = c(0, y_max)) +
 th
 }
