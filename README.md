@@ -1,1 +1,1 @@
-The R code used for proteomics data evaluation for the paper " Bovine Corpus Luteum Proteomics during Different Reproductive and Physiological Stages" by Granit Thaqi, et al. (2026). Please read the paper for more information.
+This R code used for proteomics data evaluation for the paper "Bovine Corpus Luteum Proteomics during Different Reproductive and Physiological Stages" by Granit Thaqi, et al. (2026). Please read the paper for more information.
