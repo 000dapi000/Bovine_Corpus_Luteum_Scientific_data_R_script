@@ -752,7 +752,7 @@ scale_fill_manual(values = group_colors) +
 labs(
 x = "Time points",
 y = "Number of peptides",
-title = "Total Peptides per Condition"
+title = NULL
 ) +
 scale_y_continuous(expand = c(0, 0), limits = c(0, y_max)) +
 theme_classic(base_size = 20) +
@@ -1829,15 +1829,17 @@ cat("🎉 limma volcano analysis complete. Results in:", normalizePath(volcano_o
 ################################################################################
 
 suppressPackageStartupMessages({
-library(org.Bt.eg.db)
-library(AnnotationDbi)
-library(dplyr)
-library(tidyr)
-library(ReactomePA)
-library(biomaRt)
-library(KEGGREST)
-library(GO.db)
-library(tools)
+  library(org.Bt.eg.db)
+  library(AnnotationDbi)
+  library(dplyr)
+  library(tidyr)
+  library(ReactomePA)
+  library(biomaRt)
+  library(KEGGREST)
+  library(GO.db)
+  library(tools)
+  # Optional but recommended for per-gene Reactome mappings:
+  # install.packages("BiocManager"); BiocManager::install("reactome.db")
 })
 
 # --- Safety checks ---
@@ -1846,26 +1848,26 @@ if (!dir.exists(volcano_output_dir)) stop("❌ Folder does not exist: ", volcano
 
 # --- Helper: split multi-gene entries ("A;B;C") and keep mapping back ---
 split_genes <- function(gene_vec) {
-gene_vec <- as.character(gene_vec)
-gene_vec[is.na(gene_vec)] <- ""
-gene_list <- strsplit(gene_vec, ";", fixed = TRUE)
-
-data.frame(
-Original    = rep(gene_vec, times = lengths(gene_list)),
-Gene_Single = trimws(unlist(gene_list)),
-stringsAsFactors = FALSE
-) %>%
-dplyr::filter(nzchar(Gene_Single))
+  gene_vec <- as.character(gene_vec)
+  gene_vec[is.na(gene_vec)] <- ""
+  gene_list <- strsplit(gene_vec, ";", fixed = TRUE)
+  
+  data.frame(
+    Original    = rep(gene_vec, times = lengths(gene_list)),
+    Gene_Single = trimws(unlist(gene_list)),
+    stringsAsFactors = FALSE
+  ) %>%
+    dplyr::filter(nzchar(Gene_Single))
 }
 
 # --- Cache KEGG pathway names once (optional but nice) ---
 kegg_descriptions <- tryCatch({
-desc <- utils::stack(KEGGREST::keggList("pathway", "bta"))
-data.frame(
-KEGG_Pathway      = sub("path:", "", desc$ind),
-KEGG_Description  = desc$values,
-stringsAsFactors  = FALSE
-)
+  desc <- utils::stack(KEGGREST::keggList("pathway", "bta"))
+  data.frame(
+    KEGG_Pathway      = sub("path:", "", desc$ind),
+    KEGG_Description  = desc$values,
+    stringsAsFactors  = FALSE
+  )
 }, error = function(e) NULL)
 
 # --- Cache KEGG ENTREZ -> pathway links once ---
@@ -1873,16 +1875,16 @@ kegg_link_all <- tryCatch(KEGGREST::keggLink("pathway", "bta"), error = function
 
 # --- Connect biomaRt ONCE (outside loops) ---
 cow_mart <- tryCatch(
-biomaRt::useMart("ensembl", dataset = "btaurus_gene_ensembl", host = "https://dec2021.archive.ensembl.org"),
-error = function(e) NULL
+  biomaRt::useMart("ensembl", dataset = "btaurus_gene_ensembl", host = "https://dec2021.archive.ensembl.org"),
+  error = function(e) NULL
 )
 human_mart <- tryCatch(
-biomaRt::useMart("ensembl", dataset = "hsapiens_gene_ensembl", host = "https://dec2021.archive.ensembl.org"),
-error = function(e) NULL
+  biomaRt::useMart("ensembl", dataset = "hsapiens_gene_ensembl", host = "https://dec2021.archive.ensembl.org"),
+  error = function(e) NULL
 )
 
 if (is.null(cow_mart) || is.null(human_mart)) {
-message("⚠️ biomaRt connection failed (archive host). Reactome annotation will be skipped if marts are NULL.")
+  message("⚠️ biomaRt connection failed (archive host). Reactome annotation will be skipped if marts are NULL.")
 }
 
 # --- List comparison folders ---
@@ -1890,262 +1892,308 @@ comparison_folders <- list.dirs(volcano_output_dir, recursive = FALSE, full.name
 if (!length(comparison_folders)) stop("❌ No comparison folders found in: ", volcano_output_dir)
 
 for (comp_folder in comparison_folders) {
-comp_name <- basename(comp_folder)
-
-# --- Read full volcano table (NEW naming) ---
-all_file <- file.path(comp_folder, paste0("All_proteins_", comp_name, ".txt"))
-if (!file.exists(all_file)) {
-cat("❌ Missing All_proteins file for", comp_name, ":", all_file, "\n")
-next
-}
-
-Whole_data <- utils::read.table(
-all_file, header = TRUE, sep = "\t",
-stringsAsFactors = FALSE, check.names = FALSE
-)
-
-# --- Find ONLY the raw up/down files produced by your volcano script ---
-updown_files <- list.files(
-comp_folder,
-pattern = "^T\\d+_up_T\\d+_down_.*\\.txt$",
-full.names = TRUE
-)
-updown_files <- updown_files[!grepl("_annotated\\.txt$", updown_files)]
-updown_files <- updown_files[!grepl("^Merged_matrix_", basename(updown_files))]
-
-if (!length(updown_files)) {
-cat("❌ No raw up/down files found for", comp_name, "\n")
-next
-}
-
-for (gene_file in updown_files) {
-set_label <- tools::file_path_sans_ext(basename(gene_file))
-cat("🔍 Annotating set:", set_label, "in", comp_name, "...\n")
-
-gene_df <- utils::read.table(
-gene_file, header = TRUE, sep = "\t", quote = "", fill = TRUE,
-comment.char = "", stringsAsFactors = FALSE, check.names = FALSE
-)
-
-if (!"Gene" %in% colnames(gene_df)) {
-cat("❌ 'Gene' column not found in", gene_file, "\n")
-next
-}
-
-# --- Split multi-gene entries ---
-gene_map <- split_genes(gene_df$Gene)
-if (!nrow(gene_map)) {
-cat("⚠️ No valid genes found in", gene_file, "\n")
-next
-}
-
-# ==========================================================================
-# 1) Cow SYMBOL -> Cow ENTREZ
-# ==========================================================================
-gene_entrez <- AnnotationDbi::select(
-org.Bt.eg.db,
-keys    = unique(gene_map$Gene_Single),
-columns = c("ENTREZID", "SYMBOL"),
-keytype = "SYMBOL"
-) %>% as.data.frame()
-
-gene_entrez <- gene_entrez %>%
-dplyr::filter(!is.na(ENTREZID), !is.na(SYMBOL), nzchar(ENTREZID), nzchar(SYMBOL)) %>%
-dplyr::distinct()
-
-cow_entrez <- unique(gene_entrez$ENTREZID)
-
-# ==========================================================================
-# 2) GO annotation (cow ENTREZ)
-# ==========================================================================
-go_agg <- tryCatch({
-if (!length(cow_entrez)) return(data.frame(SYMBOL = character(), GO_Pathway = character()))
-
-go_anno <- AnnotationDbi::select(
-org.Bt.eg.db,
-keys    = cow_entrez,
-columns = c("GO", "ONTOLOGY"),
-keytype = "ENTREZID"
-) %>% as.data.frame()
-
-go_anno <- go_anno %>%
-dplyr::filter(!is.na(GO), nzchar(GO))
-
-go_terms <- AnnotationDbi::select(
-GO.db,
-keys    = unique(go_anno$GO),
-columns = "TERM",
-keytype = "GOID"
-) %>% as.data.frame()
-
-go_merged <- go_anno %>%
-dplyr::left_join(go_terms, by = c("GO" = "GOID")) %>%
-dplyr::left_join(gene_entrez, by = "ENTREZID") %>%
-dplyr::mutate(GO_Pathway = paste(GO, ONTOLOGY, TERM, sep = " | ")) %>%
-dplyr::select(SYMBOL, GO_Pathway) %>%
-dplyr::filter(!is.na(SYMBOL), nzchar(SYMBOL))
-
-go_merged %>%
-dplyr::group_by(SYMBOL) %>%
-dplyr::summarise(
-GO_Pathway = paste(unique(stats::na.omit(GO_Pathway)), collapse = "; "),
-.groups = "drop"
-)
-}, error = function(e) data.frame(SYMBOL = character(), GO_Pathway = character()))
-
-# ==========================================================================
-# 3) Reactome annotation via HUMAN ortholog ENTREZ (stable)
-#    - getLDS Cow SYMBOL -> Human ENTREZ
-#    - enrichPathway(readable=FALSE) returns ENTREZ IDs in geneID
-# ==========================================================================
-reactome_agg <- tryCatch({
-if (is.null(cow_mart) || is.null(human_mart)) {
-return(data.frame(SYMBOL = character(), Reactome_Pathway = character()))
-}
-
-cow_syms <- unique(gene_map$Gene_Single)
-cow_syms <- cow_syms[nzchar(cow_syms)]
-if (!length(cow_syms)) return(data.frame(SYMBOL = character(), Reactome_Pathway = character()))
-
-chunks <- split(cow_syms, ceiling(seq_along(cow_syms) / 200))
-
-orthologs <- do.call(rbind, lapply(chunks, function(chunk) {
-tryCatch(
-biomaRt::getLDS(
-attributes  = "external_gene_name",
-filters     = "external_gene_name",
-values      = chunk,
-mart        = cow_mart,
-attributesL = c("entrezgene_id", "external_gene_name"),
-martL       = human_mart
-),
-error = function(e) NULL
-)
-}))
-
-if (is.null(orthologs) || !nrow(orthologs)) {
-return(data.frame(SYMBOL = character(), Reactome_Pathway = character()))
-}
-
-colnames(orthologs) <- c("Cow_Gene", "Human_ENTREZID", "Human_Gene")
-orthologs <- orthologs %>%
-dplyr::filter(
-!is.na(Cow_Gene), nzchar(Cow_Gene),
-!is.na(Human_ENTREZID), nzchar(Human_ENTREZID)
-) %>%
-dplyr::distinct()
-
-human_entrez <- unique(orthologs$Human_ENTREZID)
-if (!length(human_entrez)) return(data.frame(SYMBOL = character(), Reactome_Pathway = character()))
-
-enr <- ReactomePA::enrichPathway(
-gene         = human_entrez,
-organism     = "human",
-readable     = FALSE,  # keep ENTREZ IDs in geneID
-pvalueCutoff = 1,
-qvalueCutoff = 1
-)
-
-df_enr <- as.data.frame(enr)
-if (!nrow(df_enr)) return(data.frame(SYMBOL = character(), Reactome_Pathway = character()))
-
-react <- df_enr %>%
-dplyr::select(Reactome_Pathway = Description, geneID) %>%
-tidyr::separate_rows(geneID, sep = "/") %>%
-dplyr::rename(Human_ENTREZID = geneID) %>%
-dplyr::left_join(orthologs, by = "Human_ENTREZID") %>%
-dplyr::transmute(SYMBOL = Cow_Gene, Reactome_Pathway) %>%
-dplyr::filter(!is.na(SYMBOL), nzchar(SYMBOL))
-
-react %>%
-dplyr::group_by(SYMBOL) %>%
-dplyr::summarise(
-Reactome_Pathway = paste(unique(stats::na.omit(Reactome_Pathway)), collapse = "; "),
-.groups = "drop"
-)
-}, error = function(e) data.frame(SYMBOL = character(), Reactome_Pathway = character()))
-
-# ==========================================================================
-# 4) KEGG annotation (cow ENTREZ)
-# ==========================================================================
-kegg_agg <- tryCatch({
-if (!length(cow_entrez) || is.null(kegg_link_all) || !length(kegg_link_all)) {
-return(data.frame(SYMBOL = character(), kegg_results = character()))
-}
-
-formatted <- paste0("bta:", cow_entrez)
-kmap <- kegg_link_all[names(kegg_link_all) %in% formatted]
-if (!length(kmap)) return(data.frame(SYMBOL = character(), kegg_results = character()))
-
-kegg_df <- data.frame(
-ENTREZID     = sub("bta:", "", names(kmap)),
-KEGG_Pathway = sub("path:", "", unname(kmap)),
-stringsAsFactors = FALSE
-)
-
-kegg_df <- kegg_df %>%
-dplyr::left_join(gene_entrez, by = c("ENTREZID" = "ENTREZID")) %>%
-dplyr::filter(!is.na(SYMBOL), nzchar(SYMBOL))
-
-if (!is.null(kegg_descriptions) && nrow(kegg_descriptions)) {
-kegg_df <- kegg_df %>%
-dplyr::left_join(kegg_descriptions, by = "KEGG_Pathway") %>%
-dplyr::mutate(KEGG_Annotation = paste(KEGG_Description, KEGG_Pathway, sep = " | "))
-} else {
-kegg_df$KEGG_Annotation <- kegg_df$KEGG_Pathway
-}
-
-kegg_df %>%
-dplyr::group_by(SYMBOL) %>%
-dplyr::summarise(
-kegg_results = paste(unique(stats::na.omit(KEGG_Annotation)), collapse = "; "),
-.groups = "drop"
-)
-}, error = function(e) data.frame(SYMBOL = character(), kegg_results = character()))
-
-# ==========================================================================
-# 5) Merge annotations back to ORIGINAL multi-gene strings
-# ==========================================================================
-combined_annots <- gene_map %>%
-dplyr::left_join(go_agg,       by = c("Gene_Single" = "SYMBOL")) %>%
-dplyr::left_join(reactome_agg, by = c("Gene_Single" = "SYMBOL")) %>%
-dplyr::left_join(kegg_agg,     by = c("Gene_Single" = "SYMBOL")) %>%
-dplyr::group_by(Original) %>%
-dplyr::summarise(
-GO_Pathway       = ifelse(all(is.na(GO_Pathway)), NA, paste(unique(stats::na.omit(GO_Pathway)), collapse = "; ")),
-Reactome_Pathway = ifelse(all(is.na(Reactome_Pathway)), NA, paste(unique(stats::na.omit(Reactome_Pathway)), collapse = "; ")),
-kegg_results     = ifelse(all(is.na(kegg_results)), NA, paste(unique(stats::na.omit(kegg_results)), collapse = "; ")),
-.groups = "drop"
-)
-
-annotated_set <- gene_df %>%
-dplyr::left_join(combined_annots, by = c("Gene" = "Original"))
-
-# --- Save annotated set (same rows as up/down file) ---
-annotated_file <- file.path(comp_folder, paste0(set_label, "_annotated.txt"))
-utils::write.table(annotated_set, annotated_file, sep = "\t", row.names = FALSE, quote = FALSE)
-
-# ==========================================================================
-# 6) Merge annotation columns into the FULL volcano table
-#    IMPORTANT: merge only annotation columns to avoid duplicated stats columns
-# ==========================================================================
-ann_cols <- annotated_set %>%
-dplyr::select(Gene, GO_Pathway, Reactome_Pathway, kegg_results) %>%
-dplyr::mutate(Annotation_Label = "+") %>%
-dplyr::distinct()
-
-merged_matrix <- Whole_data %>%
-dplyr::left_join(ann_cols, by = "Gene")
-
-merged_file <- file.path(comp_folder, paste0("Merged_matrix_", set_label, ".txt"))
-utils::write.table(merged_matrix, merged_file, sep = "\t", row.names = FALSE, quote = FALSE)
-
-cat("✅ Annotation complete for", set_label, "in", comp_name, "\n")
-}
+  comp_name <- basename(comp_folder)
+  
+  # --- Read full volcano table (NEW naming) ---
+  all_file <- file.path(comp_folder, paste0("All_proteins_", comp_name, ".txt"))
+  if (!file.exists(all_file)) {
+    cat("❌ Missing All_proteins file for", comp_name, ":", all_file, "\n")
+    next
+  }
+  
+  Whole_data <- utils::read.table(
+    all_file, header = TRUE, sep = "\t",
+    stringsAsFactors = FALSE, check.names = FALSE
+  )
+  
+  # --- Find ONLY the raw up/down files produced by your volcano script ---
+  updown_files <- list.files(
+    comp_folder,
+    pattern = "^T\\d+_up_T\\d+_down_.*\\.txt$",
+    full.names = TRUE
+  )
+  updown_files <- updown_files[!grepl("_annotated\\.txt$", updown_files)]
+  updown_files <- updown_files[!grepl("^Merged_matrix_", basename(updown_files))]
+  
+  if (!length(updown_files)) {
+    cat("❌ No raw up/down files found for", comp_name, "\n")
+    next
+  }
+  
+  for (gene_file in updown_files) {
+    set_label <- tools::file_path_sans_ext(basename(gene_file))
+    cat("🔍 Annotating set:", set_label, "in", comp_name, "...\n")
+    
+    gene_df <- utils::read.table(
+      gene_file, header = TRUE, sep = "\t", quote = "", fill = TRUE,
+      comment.char = "", stringsAsFactors = FALSE, check.names = FALSE
+    )
+    
+    if (!"Gene" %in% colnames(gene_df)) {
+      cat("❌ 'Gene' column not found in", gene_file, "\n")
+      next
+    }
+    
+    # --- Split multi-gene entries ---
+    gene_map <- split_genes(gene_df$Gene)
+    if (!nrow(gene_map)) {
+      cat("⚠️ No valid genes found in", gene_file, "\n")
+      next
+    }
+    
+    # ==========================================================================
+    # 1) Cow SYMBOL -> Cow ENTREZ
+    # ==========================================================================
+    gene_entrez <- AnnotationDbi::select(
+      org.Bt.eg.db,
+      keys    = unique(gene_map$Gene_Single),
+      columns = c("ENTREZID", "SYMBOL"),
+      keytype = "SYMBOL"
+    ) %>% as.data.frame()
+    
+    gene_entrez <- gene_entrez %>%
+      dplyr::filter(!is.na(ENTREZID), !is.na(SYMBOL), nzchar(ENTREZID), nzchar(SYMBOL)) %>%
+      dplyr::distinct()
+    
+    cow_entrez <- unique(gene_entrez$ENTREZID)
+    
+    # ==========================================================================
+    # 2) GO annotation (cow ENTREZ)
+    # ==========================================================================
+    go_agg <- tryCatch({
+      if (!length(cow_entrez)) return(data.frame(SYMBOL = character(), GO_Pathway = character()))
+      
+      go_anno <- AnnotationDbi::select(
+        org.Bt.eg.db,
+        keys    = cow_entrez,
+        columns = c("GO", "ONTOLOGY"),
+        keytype = "ENTREZID"
+      ) %>% as.data.frame()
+      
+      go_anno <- go_anno %>%
+        dplyr::filter(!is.na(GO), nzchar(GO))
+      
+      go_terms <- AnnotationDbi::select(
+        GO.db,
+        keys    = unique(go_anno$GO),
+        columns = "TERM",
+        keytype = "GOID"
+      ) %>% as.data.frame()
+      
+      go_merged <- go_anno %>%
+        dplyr::left_join(go_terms, by = c("GO" = "GOID")) %>%
+        dplyr::left_join(gene_entrez, by = "ENTREZID") %>%
+        dplyr::mutate(GO_Pathway = paste(GO, ONTOLOGY, TERM, sep = " | ")) %>%
+        dplyr::select(SYMBOL, GO_Pathway) %>%
+        dplyr::filter(!is.na(SYMBOL), nzchar(SYMBOL))
+      
+      go_merged %>%
+        dplyr::group_by(SYMBOL) %>%
+        dplyr::summarise(
+          GO_Pathway = paste(unique(stats::na.omit(GO_Pathway)), collapse = "; "),
+          .groups = "drop"
+        )
+    }, error = function(e) data.frame(SYMBOL = character(), GO_Pathway = character()))
+    
+    # ==========================================================================
+    # 3) Reactome annotation via HUMAN ortholog ENTREZ (PER-GENE, not enrichment)
+    #    - Map Cow SYMBOL -> Human ENTREZ via biomaRt getLDS
+    #    - Then map Human ENTREZ -> Reactome pathways using reactome.db (preferred)
+    #      with fallback to ReactomePA mapping tables.
+    # ==========================================================================
+    reactome_agg <- tryCatch({
+      if (is.null(cow_mart) || is.null(human_mart)) {
+        return(data.frame(SYMBOL = character(), Reactome_Pathway = character()))
+      }
+      
+      cow_syms <- unique(gene_map$Gene_Single)
+      cow_syms <- cow_syms[nzchar(cow_syms)]
+      if (!length(cow_syms)) {
+        return(data.frame(SYMBOL = character(), Reactome_Pathway = character()))
+      }
+      
+      # --- biomaRt mapping in chunks ---
+      chunks <- split(cow_syms, ceiling(seq_along(cow_syms) / 200))
+      
+      orthologs <- do.call(rbind, lapply(chunks, function(chunk) {
+        tryCatch(
+          biomaRt::getLDS(
+            attributes  = "external_gene_name",
+            filters     = "external_gene_name",
+            values      = chunk,
+            mart        = cow_mart,
+            attributesL = c("entrezgene_id", "external_gene_name"),
+            martL       = human_mart
+          ),
+          error = function(e) NULL
+        )
+      }))
+      
+      if (is.null(orthologs) || !nrow(orthologs)) {
+        return(data.frame(SYMBOL = character(), Reactome_Pathway = character()))
+      }
+      
+      colnames(orthologs) <- c("Cow_Gene", "Human_ENTREZID", "Human_Gene")
+      
+      orthologs <- orthologs %>%
+        dplyr::mutate(
+          Cow_Gene = as.character(Cow_Gene),
+          Human_ENTREZID = as.character(Human_ENTREZID)
+        ) %>%
+        dplyr::filter(
+          !is.na(Cow_Gene), nzchar(Cow_Gene),
+          !is.na(Human_ENTREZID), nzchar(Human_ENTREZID),
+          Human_ENTREZID != "NA"
+        ) %>%
+        dplyr::distinct()
+      
+      human_entrez <- unique(orthologs$Human_ENTREZID)
+      if (!length(human_entrez)) {
+        return(data.frame(SYMBOL = character(), Reactome_Pathway = character()))
+      }
+      
+      # Preferred mapping: reactome.db (true per-gene pathway membership)
+      if (requireNamespace("reactome.db", quietly = TRUE) &&
+          requireNamespace("AnnotationDbi", quietly = TRUE)) {
+        
+        react_map <- AnnotationDbi::select(
+          reactome.db::reactome.db,
+          keys    = human_entrez,
+          columns = c("PATHID", "PATHNAME"),
+          keytype = "ENTREZID"
+        ) %>%
+          as.data.frame() %>%
+          dplyr::filter(!is.na(PATHNAME), nzchar(PATHNAME)) %>%
+          dplyr::mutate(ENTREZID = as.character(ENTREZID))
+        
+        if (!nrow(react_map)) {
+          return(data.frame(SYMBOL = character(), Reactome_Pathway = character()))
+        }
+        
+        react <- react_map %>%
+          dplyr::rename(Human_ENTREZID = ENTREZID) %>%
+          dplyr::left_join(orthologs, by = "Human_ENTREZID") %>%
+          dplyr::transmute(
+            SYMBOL = Cow_Gene,
+            Reactome_Pathway = PATHNAME
+          ) %>%
+          dplyr::filter(!is.na(SYMBOL), nzchar(SYMBOL),
+                        !is.na(Reactome_Pathway), nzchar(Reactome_Pathway))
+        
+      } else {
+        # Fallback mapping: ReactomePA tables (still per-gene, no enrichment)
+        p2g <- ReactomePA::reactomePathway2Gene
+        p2n <- ReactomePA::reactomePathway2Name
+        
+        p2g <- p2g %>% dplyr::mutate(gene = as.character(gene))
+        p2n <- p2n %>% dplyr::mutate(pathway = as.character(pathway), name = as.character(name))
+        
+        react <- p2g %>%
+          dplyr::filter(gene %in% human_entrez) %>%
+          dplyr::left_join(p2n, by = c("pathway" = "pathway")) %>%
+          dplyr::transmute(
+            Human_ENTREZID = gene,
+            Reactome_Pathway = name
+          ) %>%
+          dplyr::left_join(orthologs, by = "Human_ENTREZID") %>%
+          dplyr::transmute(SYMBOL = Cow_Gene, Reactome_Pathway) %>%
+          dplyr::filter(!is.na(SYMBOL), nzchar(SYMBOL),
+                        !is.na(Reactome_Pathway), nzchar(Reactome_Pathway))
+      }
+      
+      if (!nrow(react)) {
+        return(data.frame(SYMBOL = character(), Reactome_Pathway = character()))
+      }
+      
+      react %>%
+        dplyr::group_by(SYMBOL) %>%
+        dplyr::summarise(
+          Reactome_Pathway = paste(unique(Reactome_Pathway), collapse = "; "),
+          .groups = "drop"
+        )
+      
+    }, error = function(e) data.frame(SYMBOL = character(), Reactome_Pathway = character()))
+    
+    # ==========================================================================
+    # 4) KEGG annotation (cow ENTREZ)
+    # ==========================================================================
+    kegg_agg <- tryCatch({
+      if (!length(cow_entrez) || is.null(kegg_link_all) || !length(kegg_link_all)) {
+        return(data.frame(SYMBOL = character(), kegg_results = character()))
+      }
+      
+      formatted <- paste0("bta:", cow_entrez)
+      kmap <- kegg_link_all[names(kegg_link_all) %in% formatted]
+      if (!length(kmap)) return(data.frame(SYMBOL = character(), kegg_results = character()))
+      
+      kegg_df <- data.frame(
+        ENTREZID     = sub("bta:", "", names(kmap)),
+        KEGG_Pathway = sub("path:", "", unname(kmap)),
+        stringsAsFactors = FALSE
+      )
+      
+      kegg_df <- kegg_df %>%
+        dplyr::left_join(gene_entrez, by = c("ENTREZID" = "ENTREZID")) %>%
+        dplyr::filter(!is.na(SYMBOL), nzchar(SYMBOL))
+      
+      if (!is.null(kegg_descriptions) && nrow(kegg_descriptions)) {
+        kegg_df <- kegg_df %>%
+          dplyr::left_join(kegg_descriptions, by = "KEGG_Pathway") %>%
+          dplyr::mutate(KEGG_Annotation = paste(KEGG_Description, KEGG_Pathway, sep = " | "))
+      } else {
+        kegg_df$KEGG_Annotation <- kegg_df$KEGG_Pathway
+      }
+      
+      kegg_df %>%
+        dplyr::group_by(SYMBOL) %>%
+        dplyr::summarise(
+          kegg_results = paste(unique(stats::na.omit(KEGG_Annotation)), collapse = "; "),
+          .groups = "drop"
+        )
+    }, error = function(e) data.frame(SYMBOL = character(), kegg_results = character()))
+    
+    # ==========================================================================
+    # 5) Merge annotations back to ORIGINAL multi-gene strings
+    # ==========================================================================
+    combined_annots <- gene_map %>%
+      dplyr::left_join(go_agg,       by = c("Gene_Single" = "SYMBOL")) %>%
+      dplyr::left_join(reactome_agg, by = c("Gene_Single" = "SYMBOL")) %>%
+      dplyr::left_join(kegg_agg,     by = c("Gene_Single" = "SYMBOL")) %>%
+      dplyr::group_by(Original) %>%
+      dplyr::summarise(
+        GO_Pathway       = ifelse(all(is.na(GO_Pathway)), NA, paste(unique(stats::na.omit(GO_Pathway)), collapse = "; ")),
+        Reactome_Pathway = ifelse(all(is.na(Reactome_Pathway)), NA, paste(unique(stats::na.omit(Reactome_Pathway)), collapse = "; ")),
+        kegg_results     = ifelse(all(is.na(kegg_results)), NA, paste(unique(stats::na.omit(kegg_results)), collapse = "; ")),
+        .groups = "drop"
+      )
+    
+    annotated_set <- gene_df %>%
+      dplyr::left_join(combined_annots, by = c("Gene" = "Original"))
+    
+    # --- Save annotated set (same rows as up/down file) ---
+    annotated_file <- file.path(comp_folder, paste0(set_label, "_annotated.txt"))
+    utils::write.table(annotated_set, annotated_file, sep = "\t", row.names = FALSE, quote = FALSE)
+    
+    # ==========================================================================
+    # 6) Merge annotation columns into the FULL volcano table
+    #    IMPORTANT: merge only annotation columns to avoid duplicated stats columns
+    # ==========================================================================
+    ann_cols <- annotated_set %>%
+      dplyr::select(Gene, GO_Pathway, Reactome_Pathway, kegg_results) %>%
+      dplyr::mutate(Annotation_Label = "+") %>%
+      dplyr::distinct()
+    
+    merged_matrix <- Whole_data %>%
+      dplyr::left_join(ann_cols, by = "Gene")
+    
+    merged_file <- file.path(comp_folder, paste0("Merged_matrix_", set_label, ".txt"))
+    utils::write.table(merged_matrix, merged_file, sep = "\t", row.names = FALSE, quote = FALSE)
+    
+    cat("✅ Annotation complete for", set_label, "in", comp_name, "\n")
+  }
 }
 
 cat("\n🎉 Annotation complete for all volcano comparison sets.\n")
-
 
 
 ################################################################################
@@ -2291,7 +2339,6 @@ cat("\n🎉 Fisher exact test complete for all Volcano results.\n")
 ################################################################################
 ################################################################################
 
-
 ################################################################################
 ################################################################################
 ################################################################################
@@ -2301,6 +2348,8 @@ cat("\n🎉 Fisher exact test complete for all Volcano results.\n")
 # - Readable output with paging and keyword filter
 # - AUTO x-axis gene label size + AUTO angle + AUTO plot width/height (per page)
 #   so gene text stays readable across wide ranges of significant proteins.
+#
+# UPDATE: Remove Reactome "Homo sapiens:" prefix from pathway display + merging
 ################################################################################
 ################################################################################
 ################################################################################
@@ -2372,6 +2421,16 @@ LEGEND_TEXT_SIZE  <- 20
 LEGEND_KEY_HEIGHT_PT <- 12
 LEGEND_KEY_WIDTH_PT  <- 10
 
+# ---- NEW: strip "Homo sapiens:" prefix helper ----
+strip_species_prefix <- function(x) {
+  x %>%
+    as.character() %>%
+    stringr::str_replace_all("[\u00A0]", " ") %>%
+    stringr::str_squish() %>%
+    stringr::str_replace(stringr::regex("^homo\\s+sapiens\\s*:\\s*", ignore_case = TRUE), "") %>%
+    stringr::str_squish()
+}
+
 # ---- Helper functions ----
 first_col <- function(df, cand) {
   c <- cand[cand %in% names(df)]
@@ -2404,7 +2463,6 @@ auto_angle_x <- function(n_genes) {
 }
 
 # AUTO plot width (inches) based on genes shown on the page
-# This is the key to "gene text all can read across all range".
 auto_plot_width_in <- function(n_genes,
                                base_w = A4_W,
                                min_w  = 16,
@@ -2494,6 +2552,10 @@ for (fdir in fisher_dirs) {
           .gene_n    = vapply(.genes_raw, count_genes, integer(1))
         ) %>%
         dplyr::filter(is.finite(.p), .p < P_ADJ_CUTOFF, .gene_n >= MIN_PROTEINS) %>%
+        dplyr::mutate(
+          # NEW: strip "Homo sapiens:" before keyword filter & merging
+          Pathway = strip_species_prefix(Pathway)
+        ) %>%
         dplyr::filter(
           stringr::str_detect(
             tolower(Pathway),
@@ -2582,7 +2644,6 @@ for (fdir in fisher_dirs) {
       AXIS_FONTSIZE_X_AUTO <- auto_axis_fontsize_x(n_genes_page)
       ANGLE_X_AUTO <- auto_angle_x(n_genes_page)
       
-      # Key improvement: auto width/height so genes are readable across ranges
       W_IN <- auto_plot_width_in(n_genes_page)
       H_IN <- auto_plot_height_in(n_paths_page)
       
@@ -2601,7 +2662,6 @@ for (fdir in fisher_dirs) {
           name = "-log10(p.adj)"
         ) +
         scale_x_discrete(position = "top", guide = guide_axis(check.overlap = TRUE)) +
-        # Remove title + x label, keep gene tick labels
         labs(title = NULL, x = NULL, y = "Enriched Pathway", caption = caption_txt) +
         theme_minimal(base_size = BASE_FONTSIZE) +
         theme(
@@ -2660,14 +2720,14 @@ cat("\n🎉 All enrichment plots generated with merged pathway sources and reada
 ################################################################################
 
 # ----------------------------------------------------------
-# Volcano Sankey: Top 5 Pathways PER Timepoint (Timepoint-specific)
-# Keeps all your filters:
-#  - keyword filter (global_keywords)
-#  - dedup via Pathway_key (lower/trim/squish)
-#  - FDR_CUTOFF and MIN_PROTEINS
-# Key change vs your current script:
-#  - selection is done PER timepoint, and we KEEP ONLY those pathway-timepoint pairs
-#    (so no “shared pathway across many TPs unless it is top in those TPs too”)
+# Volcano Sankey: Top N Pathways PER Timepoint (Timepoint-specific)
+# - Keyword filter (global_keywords)
+# - Dedup via Pathway_key (lower/trim/squish)
+# - FDR_CUTOFF and MIN_PROTEINS
+# - Selection is done PER timepoint; keep ONLY pathway-timepoint pairs selected
+#
+# UPDATE: Reactome labels -> remove leading "Homo sapiens:" (case-insensitive)
+#         so Sankey shows "Metabolism" instead of "Homo sapiens: Metabolism"
 # ----------------------------------------------------------
 
 suppressPackageStartupMessages({
@@ -2682,7 +2742,7 @@ suppressPackageStartupMessages({
   library(jsonlite)
 })
 
-cat("🔎 Starting Volcano Sankey: Timepoint-specific Top 5 Per T1-T10\n")
+cat("🔎 Starting Volcano Sankey: Timepoint-specific Top N Per T1-T10\n")
 
 volcano_root <- file.path(getwd(), "Volcano_Results_limma_BH")
 if (!dir.exists(volcano_root)) stop("❌ 'Volcano_Results_limma_BH' folder not found at: ", volcano_root)
@@ -2695,44 +2755,58 @@ FDR_CUTOFF   <- 0.01
 MIN_PROTEINS <- 5
 TOP_N        <- 10   # <---- timepoint-specific top N
 
+# --- NEW: strip "Homo sapiens:" prefix for display (and optionally for keys) ---
+strip_species_prefix <- function(x) {
+  x %>%
+    as.character() %>%
+    # normalize NBSP -> space, squish first so regex is stable
+    stringr::str_replace_all("[\u00A0]", " ") %>%
+    stringr::str_squish() %>%
+    # remove leading "Homo sapiens:" (any capitalization, optional spaces around colon)
+    stringr::str_replace(regex("^homo\\s+sapiens\\s*:\\s*", ignore_case = TRUE), "") %>%
+    # in case there are multiple prefixes (rare), remove repeatedly
+    stringr::str_replace(regex("^homo\\s+sapiens\\s*:\\s*", ignore_case = TRUE), "") %>%
+    stringr::str_squish()
+}
+
 # --- Pathway normalization helpers (KEY FIX) ---
 normalize_pathway <- function(x) {
   x %>%
-    as.character() %>%
-    stringr::str_replace_all("[\u00A0]", " ") %>%  # non-breaking spaces -> normal space
-    stringr::str_squish() %>%                      # trim + collapse multiple spaces
-    stringr::str_to_lower()                        # case-insensitive key
+    strip_species_prefix() %>%                 # <-- apply prefix removal BEFORE key
+    stringr::str_to_lower()                    # case-insensitive key
 }
+
 pretty_pathway <- function(key) {
+  # key is already lower; convert to Title for display
   stringr::str_to_title(key)
 }
 
 global_keywords <- c(
   # Metabolism
-  "amino acid metabolism", "translation initiation", "rRNA processing",
+  "amino acid metabolism", "translation initiation", "rrna processing",
   "mitochondrial translation", "lipid metabolism", "carbohydrate metabolism",
   "central carbon metabolism", "nucleotide metabolism", "glucose metabolism",
-  "pyruvate metabolism", "Citrate cycle (TCA cycle)", "glycolysis", "gluconeogenesis",
+  "pyruvate metabolism", "citrate cycle (tca cycle)", "glycolysis", "gluconeogenesis",
   "beta oxidation", "fatty acid degradation", "steroid metabolism",
   "cholesterol metabolism", "glutathione metabolism", "methionine metabolism",
   "polyamine metabolism", "biosynthesis of amino acids",
   
   # Signaling
-  "WNT signaling", "MAPK signaling", "interleukin signaling", "TNF signaling",
-  "JAK-STAT signaling", "TGF-beta signaling", "interferon signaling",
-  "NOTCH signaling", "EGFR signaling", "HIF-1 signaling", "TP53 signaling",
-  "TCR signaling", "B cell receptor", "chemokine signaling",
+  "wnt signaling", "mapk signaling", "interleukin signaling", "tnf signaling",
+  "jak-stat signaling", "tgf-beta signaling", "interferon signaling",
+  "notch signaling", "egfr signaling", "hif-1 signaling", "tp53 signaling",
+  "tcr signaling", "b cell receptor", "chemokine signaling",
   
   # Stress & Apoptosis
-  "UPR", "autophagy", "apoptosis", "programmed cell death",
-  "cellular senescence", "hypoxia response", "DNA repair", "DNA replication",
+  "upr", "autophagy", "apoptosis", "programmed cell death",
+  "cellular senescence", "hypoxia response", "dna repair", "dna replication",
   "mitotic cell cycle", "cell cycle checkpoints",
   
   # Immune / Matrix / Transport
   "neutrophil degranulation", "extracellular matrix", "platelet activation",
   "lysosome", "endosome", "vesicle-mediated transport", "deubiquitination",
   "proteolysis", "biological oxidations", "organelle biogenesis",
-  "ECM-receptor interaction",
+  "ecm-receptor interaction",
   
   # Development / Morphogenesis
   "gastrulation", "somitogenesis", "chromatin organization", "histone modification",
@@ -2755,12 +2829,12 @@ read_and_tidy <- function(filepath) {
     return(NULL)
   }
   
-  src      <- m[2]
-  first_tp <- m[3]
+  src       <- m[2]
+  first_tp  <- m[3]
   second_tp <- m[4]
-  comp     <- m[5]
-  side     <- if (startsWith(comp, first_tp)) "First" else "Second"
-  up_in    <- first_tp
+  comp      <- m[5]
+  side      <- if (startsWith(comp, first_tp)) "First" else "Second"
+  up_in     <- first_tp
   
   df <- tryCatch(openxlsx::read.xlsx(filepath), error = function(e) NULL)
   if (is.null(df)) {
@@ -2779,8 +2853,9 @@ read_and_tidy <- function(filepath) {
   df2 <- df %>%
     dplyr::mutate(
       Source = src, Up_in = up_in, Side = side, Comparison = comp,
-      Pathway = stringr::str_squish(as.character(Pathway)),
-      Pathway_key  = normalize_pathway(Pathway),
+      Pathway_raw = stringr::str_squish(as.character(Pathway)),
+      Pathway = strip_species_prefix(Pathway_raw),      # <-- display-cleaned pathway
+      Pathway_key  = normalize_pathway(Pathway_raw),    # <-- key-cleaned pathway
       Pathway_disp = pretty_pathway(Pathway_key)
     ) %>%
     dplyr::filter(!is.na(.data[[gene_col]]), .data[[gene_col]] != "") %>%
@@ -2850,7 +2925,7 @@ dat <- dat %>%
   )
 
 # ----------------------------------------------------------
-# TIMEPOINT-SPECIFIC SELECTION (Key change)
+# TIMEPOINT-SPECIFIC SELECTION
 # 1) Compute pathway stats per timepoint
 # 2) Apply MIN_PROTEINS and FDR_CUTOFF
 # 3) Pick TOP_N per timepoint
@@ -2891,7 +2966,7 @@ pathways_ordered_disp <- top_tp %>%
   dplyr::pull(Pathway_disp) %>%
   unique()
 
-# --- Sankey weighting (still your style), now inherently timepoint-specific ---
+# --- Sankey weighting (your style), now inherently timepoint-specific ---
 path_counts <- dat_sel %>%
   dplyr::group_by(Pathway_key) %>%
   dplyr::summarise(n_link = dplyr::n_distinct(Timepoint), .groups = "drop")
@@ -3013,7 +3088,7 @@ invisible(sankey)
 }
 
 # --- Output directory and plot ---
-out_root <- file.path(volcano_root, "Sankey_Top5_TimepointSpecific_T1toT10_Manuscript")
+out_root <- file.path(volcano_root, "Sankey_TopN_TimepointSpecific_T1toT10_Manuscript_NoSpeciesPrefix")
 if (!dir.exists(out_root)) dir.create(out_root, recursive = TRUE, showWarnings = FALSE)
 
 cat("🔎 Plotting Timepoint-specific Top pathways per Timepoint...\n")
