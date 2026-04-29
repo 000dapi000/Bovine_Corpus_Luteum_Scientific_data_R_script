@@ -356,7 +356,7 @@ file.path(out_dir, "A_overview_correlation_heatmap_80samples_LOWER_TRIANGLE.png"
 width = 12,
 height = 11,
 units = "in",
-res = 300
+res = 600
 )
 grid.newpage()
 draw_with_padding(ph$gtable)
@@ -386,7 +386,7 @@ cluster_rows = TRUE, cluster_cols = TRUE,
 display_numbers = TRUE, number_format = "%.2f",
 fontsize_row = 9, fontsize_col = 9, fontsize_number = 9,
 filename = file.path(out_dir, paste0("B_withinTime_corr_", tp, ".png")),
-width = 6, height = 5, dpi = 300
+width = 6, height = 5, dpi = 600
 )
 
 pdf(file.path(out_dir, paste0("B_withinTime_corr_", tp, ".pdf")), width = 6, height = 5)
@@ -437,7 +437,7 @@ y = "Mean Pearson correlation"
 
 theme_classic(base_size = 50) +
 theme(
-plot.title   = element_text(size = 30, face = "bold"),
+plot.title   = element_text(size = 30, face = "plain"),
 axis.title.x = element_text(size = 30),
 axis.title.y = element_text(size = 30),
 axis.text.x  = element_text(size = 20, angle = 90, vjust = 0.5, hjust = 1),
@@ -446,7 +446,7 @@ axis.text.y  = element_text(size = 20)
 
 ggsave(
 file.path(out_dir, "C_meanCorrelation_perSample_ordered_T1_1_to_T10_8.png"),
-p_bar, width = 20, height = 12, dpi = 300, bg = "white"
+p_bar, width = 20, height = 12, dpi = 600, bg = "white"
 )
 
 ggsave(
@@ -752,7 +752,7 @@ scale_fill_manual(values = group_colors) +
 labs(
 x = "Time points",
 y = "Number of peptides",
-title = NULL
+title = "Total peptides per time point"
 ) +
 scale_y_continuous(expand = c(0, 0), limits = c(0, y_max)) +
 theme_classic(base_size = 20) +
@@ -760,11 +760,11 @@ theme(
 legend.position = "none",
 axis.line        = element_line(color = "black", linewidth = 1.2),
 axis.ticks       = element_line(color = "black", linewidth = 1),
-axis.text.x      = element_text(size = 22, color = "black", face = "bold"),
-axis.text.y      = element_text(size = 22, color = "black", face = "bold"),
+axis.text.x      = element_text(size = 22, color = "black", face = "plain"),
+axis.text.y      = element_text(size = 22, color = "black", face = "plain"),
 axis.title.x     = element_text(size = 24, color = "black", face = "bold", margin = margin(t = 18)),
 axis.title.y     = element_text(size = 24, color = "black", face = "bold", margin = margin(r = 18)),
-plot.title       = element_text(size = 26, color = "black", face = "bold",
+plot.title       = element_text(size = 26, color = "black", face = "plain",
 hjust = 0.5, margin = margin(b = 22)),
 plot.background  = element_rect(fill = "white", color = NA),
 panel.background = element_rect(fill = "white", color = NA)
@@ -775,7 +775,7 @@ print(plot_peptides)
 # Export PNG
 ggsave(
 "peptide_totals_T1_T10_colored_opencircle.png",
-plot_peptides, width = 10, height = 7, dpi = 300, bg = "white"
+plot_peptides, width = 10, height = 7, dpi = 600, bg = "white"
 )
 
 ################################################################################
@@ -857,7 +857,7 @@ scale_color_manual(values = c("Cumulative" = "#008000",  # vivid green
 "Shared" = "black")) +  # vivid orange
 labs(
 y = "Number of proteins",
-x = "Time points",
+x = "Biological samples",
 title = NULL
 ) +
 scale_x_discrete(labels = sample_names) +
@@ -867,19 +867,19 @@ theme(
 legend.title = element_blank(),
 legend.position = "none",
 axis.text.x = element_text(angle = 90, vjust = 0, hjust = 0, size = 14),
-axis.text.y = element_text(size = 22, color = "black", face = "bold"),
+axis.text.y = element_text(size = 22, color = "black", face = "plain"),
 axis.title.x = element_text(size = 24, color = "black", face = "bold", margin = margin(t = 18)),
 axis.title.y = element_text(size = 24, color = "black", face = "bold", margin = margin(r = 18)),
-plot.title   = element_text(size = 26, color = "black", face = "bold", hjust = 0.5, margin = margin(b = 22)),
+plot.title   = element_text(size = 26, color = "black", face = "plain", hjust = 0.5, margin = margin(b = 22)),
 plot.background  = element_rect(fill = "white", color = NA),
 panel.background = element_rect(fill = "white", color = NA)
 )
 
 print(p)
 
-# 9. Export PNG, white background, 300 dpi, auto width, height fixed
+# 9. Export PNG, white background, 600 dpi, auto width, height fixed
 ggsave("Cumulative and Shared Trends_number_of_protein.png",
-p, width = plot_width, height = 7, dpi = 300, bg = "white")
+p, width = plot_width, height = 7, dpi = 600, bg = "white")
 
 ################################################################################
 ################################################################################
@@ -928,11 +928,11 @@ theme(
 legend.position = "none",
 axis.line    = element_line(color = "black", linewidth = 1.2),
 axis.ticks   = element_line(color = "black", linewidth = 1),
-axis.text.x  = element_text(size = 22, color = "black", face = "bold"),
-axis.text.y  = element_text(size = 22, color = "black", face = "bold"),
+axis.text.x  = element_text(size = 22, color = "black", face = "plain"),
+axis.text.y  = element_text(size = 22, color = "black", face = "plain"),
 axis.title.x = element_text(size = 24, color = "black", face = "bold", margin = margin(t = 18)),
 axis.title.y = element_text(size = 24, color = "black", face = "bold", margin = margin(r = 18)),
-plot.title   = element_text(size = 26, color = "black", face = "bold", hjust = 0.5, margin = margin(b = 22))
+plot.title   = element_text(size = 26, color = "black", face = "plain", hjust = 0.5, margin = margin(b = 22))
 )
 
 # Base plot function
@@ -946,7 +946,7 @@ position = position_jitter(width = 0.10),
 size = 3.5, shape = 21, stroke = 1.2,
 color = "black", fill = "white") +
 scale_fill_manual(values = group_colors) +
-labs(x = "Time points", y = "Number of proteins", title = NULL) +
+labs(x = "Time points", y = "Number of proteins", title = "Total proteins per time point") +
 scale_y_continuous(expand = c(0, 0), limits = c(0, y_max)) +
 th
 }
@@ -955,7 +955,7 @@ th
 y1 <- max(sum_df$mean + sum_df$sd, df$ProteinCount) * 1.10
 p1 <- base_plot("Total Proteins per Condition", y1)
 print(p1)
-ggsave("protein_totals_T1_T10_colored.png", p1, width = 10, height = 7, dpi = 300, bg = "white")
+ggsave("protein_totals_T1_T10_colored.png", p1, width = 10, height = 7, dpi = 600, bg = "white")
 
 # --- Plot 2: WITH cumulative + shared ---
 conds <- paste0("T", 1:10)
@@ -980,7 +980,7 @@ size = 2.6, color = "black")
 
 print(p2)
 ggsave("protein_totals_T1_T10_colored_with_trends.png",
-p2, width = 10, height = 7, dpi = 300, bg = "white")
+p2, width = 10, height = 7, dpi = 600, bg = "white")
 
 ################################################################################
 
@@ -1168,15 +1168,15 @@ size = 2
 scale_color_manual(values = group_colors) +
 labs(
 title = title_text,
-x = NULL,
+x = "Time point",
 y = "log2 LFQ intensity"
 ) +
 theme_classic(base_size = 20) +
 theme(
-axis.text.x = element_text(size = 20, angle = 90, hjust = 1, vjust = 1),
-axis.text.y = element_text(size = 12, color = "black"),
-axis.title.x = element_text(face = "plain"),
-axis.title.y = element_text(face = "plain"),
+axis.text.x = element_text(size = 20, angle = 90, hjust = 0.5, vjust = 0.5),
+axis.text.y = element_text(size = 20, color = "black"),
+axis.title.x = element_text(size = 28, face = "bold"),
+axis.title.y = element_text(size = 28, face = "bold"),
 plot.title  = element_text(face = "plain", hjust = 0.5, size = 32),
 legend.position = "none"
 ) +
@@ -1213,7 +1213,7 @@ S_qn$median  - S_qn$sd,  S_qn$median  + S_qn$sd
 ylims <- range(all_vals, na.rm = TRUE)
 
 # --- Build 4 plots ---
-p1 <- plot_dist_medianSD(L_raw, S_raw, "all raw proteins", ylims)
+p1 <- plot_dist_medianSD(L_raw, S_raw, "All raw proteins", ylims)
 p2 <- plot_dist_medianSD(L_70,  S_70,  "70% filter", ylims)
 p3 <- plot_dist_medianSD(L_imp, S_imp, "Imputation", ylims)
 p4 <- plot_dist_medianSD(L_qn,  S_qn,  "Quantile normalization", ylims)
@@ -1225,14 +1225,79 @@ print(p_all)
 # --- Save combined + individual ---
 ggsave(
 "Fig2_sensitivity_4panel_allProteins_medianSD_THICK.png",
-p_all, width = 22, height = 12, dpi = 300, bg = "white"
+p_all, width = 22, height = 12, dpi = 600, bg = "white"
 )
 
-ggsave("Fig2A_RAW_allProteins_medianSD_THICK.png",     p1, width = 20, height = 8, dpi = 300, bg = "white")
-ggsave("Fig2B_valid70_allProteins_medianSD_THICK.png", p2, width = 20, height = 8, dpi = 300, bg = "white")
-ggsave("Fig2C_imputed_allProteins_medianSD_THICK.png", p3, width = 20, height = 8, dpi = 300, bg = "white")
-ggsave("Fig2D_QN_allProteins_medianSD_THICK.png",      p4, width = 20, height = 8, dpi = 300, bg = "white")
+ggsave("Fig2A_RAW_allProteins_medianSD_THICK.png",     p1, width = 20, height = 8, dpi = 600, bg = "white")
+ggsave("Fig2B_valid70_allProteins_medianSD_THICK.png", p2, width = 20, height = 8, dpi = 600, bg = "white")
+ggsave("Fig2C_imputed_allProteins_medianSD_THICK.png", p3, width = 20, height = 8, dpi = 600, bg = "white")
+ggsave("Fig2D_QN_allProteins_medianSD_THICK.png",      p4, width = 20, height = 8, dpi = 600, bg = "white")
 
+
+################################################################################
+################################################################################
+################################################################################
+
+################################################################################
+# ADDITIONAL GRAPHS: GROUP-level VIOLIN + BOXPLOT
+# Old script above is untouched
+################################################################################
+
+plot_group_violin_box <- function(df_long, title_text, ylims) {
+  ggplot(df_long, aes(x = Group, y = LFQ, fill = Group)) +
+    
+    geom_violin(
+      width = 0.8,
+      alpha = 0.45,
+      trim = FALSE,
+      color = NA
+    ) +
+    
+    geom_boxplot(
+      width = 0.18,
+      outlier.shape = NA,
+      alpha = 0.85,
+      color = "black"
+    ) +
+    
+    scale_fill_manual(values = group_colors) +
+    
+    labs(
+      title = title_text,
+      x = "Time points",
+      y = "log2 LFQ intensity"
+    ) +
+    
+    theme_classic(base_size = 25) +
+    theme(
+      axis.text.x = element_text(size = 25, angle = 0, hjust = 0.5),
+      axis.text.y = element_text(size = 25, color = "black"),
+      axis.title.x = element_text(size = 28, face = "bold"),
+      axis.title.y = element_text(size = 28, face = "bold"),
+      plot.title  = element_text(face = "plain", hjust = 0.5, size = 32),
+      legend.position = "none"
+    ) +
+    
+    coord_cartesian(ylim = ylims)
+}
+
+pg_vb1 <- plot_group_violin_box(L_raw, "All raw proteins", ylims)
+pg_vb2 <- plot_group_violin_box(L_70,  "70% filter", ylims)
+pg_vb3 <- plot_group_violin_box(L_imp, "Imputation", ylims)
+pg_vb4 <- plot_group_violin_box(L_qn,  "Quantile normalization", ylims)
+
+p_group_violin_box_all <- (pg_vb1 + pg_vb2) / (pg_vb3 + pg_vb4)
+print(p_group_violin_box_all)
+
+ggsave(
+  "Fig2_group_violin_boxplot_4panel.png",
+  p_group_violin_box_all, width = 18, height = 12, dpi = 600, bg = "white"
+)
+
+ggsave("Fig2A_RAW_group_violin_boxplot.png",     pg_vb1, width = 10, height = 8, dpi = 600, bg = "white")
+ggsave("Fig2B_valid70_group_violin_boxplot.png", pg_vb2, width = 10, height = 8, dpi = 600, bg = "white")
+ggsave("Fig2C_imputed_group_violin_boxplot.png", pg_vb3, width = 10, height = 8, dpi = 600, bg = "white")
+ggsave("Fig2D_QN_group_violin_boxplot.png",      pg_vb4, width = 10, height = 8, dpi = 600, bg = "white")
 
 ################################################################################
 ################################################################################
@@ -1281,10 +1346,10 @@ custom_theme_splsda <- function(base_size = 14) {
 theme_minimal(base_size = base_size) +
 theme(
 panel.border = element_rect(color = "black", fill = NA, linewidth = 1),
-plot.title = element_text(size = base_size + 4, face = "bold", hjust = 0.5),
-axis.title = element_text(size = base_size + 2, face = "bold"),
+plot.title = element_text(size = base_size + 4, face = "plain", hjust = 0.5),
+axis.title = element_text(size = base_size + 2, face = "plain"),
 axis.text = element_text(size = base_size),
-legend.title = element_text(size = base_size, face = "bold"),
+legend.title = element_text(size = base_size, face = "plain"),
 legend.text = element_text(size = base_size),
 legend.position = "bottom"
 )
@@ -1316,7 +1381,7 @@ theme_minimal(base_size = 14) +
 theme(panel.border = element_rect(color = "black", fill = NA))
 print(gg_keepx)
 ggsave(file.path(output_dir, "keepX_per_component_T1_T10.png"),
-plot = gg_keepx, dpi = 300, width = 6, height = 5, bg = "white")
+plot = gg_keepx, dpi = 600, width = 6, height = 5, bg = "white")
 
 # ---- [Fit Final Model] ----
 splsda_model <- splsda(X, Y, ncomp = optimal_ncomp, keepX = optimal_keepX)
@@ -1370,7 +1435,7 @@ geom_polygon(data = ellipse_data, aes(group = Group), alpha = 0.18, color = NA) 
 geom_path(data = ellipse_data, aes(group = Group), linewidth = 1) +
 geom_text_repel(data = group_centroids,
 aes(label = paste0(Group, "\n(n=", count, ")")),
-color = "black", size = 5, fontface = "bold",
+color = "black", size = 5, fontface = "plain",
 max.overlaps = 100, box.padding = 0.6, point.padding = 0.6) +
 scale_color_manual(values = group_colors) +
 scale_fill_manual(values = group_colors) +
@@ -1382,7 +1447,7 @@ custom_theme_splsda()
 
 print(p)
 ggsave(file.path(output_dir, paste0("sPLS-DA_T1-T10_Comp", i, "_vs_Comp", j, ".png")),
-plot = p, dpi = 300, width = 10, height = 10, bg = "white")
+plot = p, dpi = 600, width = 10, height = 10, bg = "white")
 }
 }
 
@@ -1473,12 +1538,12 @@ y = "Variance Explained (%)"
 theme_minimal(base_size = 16) +
 theme(
 panel.border = element_rect(color = "black", fill = NA, linewidth = 1),
-plot.title = element_text(face = "bold", hjust = 0.5)
+plot.title = element_text(face = "plain", hjust = 0.5)
 )
 
 print(gg_elbow)
 ggsave(file.path(pca_output_dir, "PCA_Elbow_Plot_T1_T10_mixOmics.png"),
-gg_elbow, width = 8, height = 6, dpi = 300, bg = "white")
+gg_elbow, width = 8, height = 6, dpi = 600, bg = "white")
 
 # ---- [Determine Optimal Components] ----
 optimal_ncomp <- min(which(elbow_df$Cumulative >= 90))
@@ -1531,7 +1596,7 @@ label = "paste0(Group, '\\n(n=', count, ')')",
 color = "Group"
 ),
 size = 8,
-fontface = "bold",
+fontface = "plain",
 alpha = 1,   # 👈 group text label transparency
 show.legend = FALSE,
 max.overlaps = 100,
@@ -1551,13 +1616,13 @@ y = paste0(pcy_name, " (", round(var_explained[pcy], 1), "%)")
 theme_minimal(base_size = 32) +
 theme(
 panel.border = element_rect(color = "black", fill = NA, linewidth = 1),
-plot.title = element_text(face = "bold", hjust = 0.5),
-axis.title = element_text(face = "bold"),
+plot.title = element_text(face = "plain", hjust = 0.5),
+axis.title = element_text(face = "plain"),
 legend.position = "none"
 )
 
 out_name <- paste0("PCA_T1-T10_", pcx_name, "_vs_", pcy_name, ".png")
-ggsave(file.path(output_dir, out_name), p, width = 8, height = 8, dpi = 300, bg = "white")
+ggsave(file.path(output_dir, out_name), p, width = 8, height = 8, dpi = 600, bg = "white")
 
 return(p)
 }
@@ -1789,15 +1854,15 @@ color = NULL
 ) +
 theme_classic(base_size = 30) +
 theme(
-plot.title = element_text(size = 30, face = "bold", hjust = 0.5),
-axis.title = element_text(size = 30, face = "bold"),
+plot.title = element_text(size = 30, face = "plain", hjust = 0.5),
+axis.title = element_text(size = 30, face = "plain"),
 axis.text  = element_text(size = 30),
 legend.text = element_text(size = 25),
 legend.position = "bottom"
 )
 
 ggsave(file.path(comp_dir, paste0("Volcano_", comp, ".png")),
-p, dpi = 300, width = 12, height = 12, bg = "white")
+p, dpi = 600, width = 12, height = 12, bg = "white")
 
 cat("✅ Volcano saved for", comp, "\n")
 invisible(df)
@@ -2720,14 +2785,8 @@ cat("\n🎉 All enrichment plots generated with merged pathway sources and reada
 ################################################################################
 
 # ----------------------------------------------------------
-# Volcano Sankey: Top N Pathways PER Timepoint (Timepoint-specific)
-# - Keyword filter (global_keywords)
-# - Dedup via Pathway_key (lower/trim/squish)
-# - FDR_CUTOFF and MIN_PROTEINS
-# - Selection is done PER timepoint; keep ONLY pathway-timepoint pairs selected
-#
-# UPDATE: Reactome labels -> remove leading "Homo sapiens:" (case-insensitive)
-#         so Sankey shows "Metabolism" instead of "Homo sapiens: Metabolism"
+# Volcano Sankey: Top N Pathways PER Timepoint
+# Margin-safe version using package::function
 # ----------------------------------------------------------
 
 suppressPackageStartupMessages({
@@ -2745,44 +2804,67 @@ suppressPackageStartupMessages({
 cat("🔎 Starting Volcano Sankey: Timepoint-specific Top N Per T1-T10\n")
 
 volcano_root <- file.path(getwd(), "Volcano_Results_limma_BH")
-if (!dir.exists(volcano_root)) stop("❌ 'Volcano_Results_limma_BH' folder not found at: ", volcano_root)
+if (!dir.exists(volcano_root)) stop("❌ Folder not found: ", volcano_root)
 
 timepoints <- paste0("T", 1:10)
-tp_colors  <- RColorBrewer::brewer.pal(10, "Paired")
+tp_colors <- RColorBrewer::brewer.pal(10, "Paired")
 names(tp_colors) <- timepoints
 
 FDR_CUTOFF   <- 0.01
 MIN_PROTEINS <- 5
-TOP_N        <- 10   # <---- timepoint-specific top N
+TOP_N        <- 10
 
-# --- NEW: strip "Homo sapiens:" prefix for display (and optionally for keys) ---
+PLOT_W <- 1500
+PLOT_H <- 750
+
+MARGIN_L <- 800
+MARGIN_R <- 140
+MARGIN_T <- 40
+MARGIN_B <- 40
+
+INNER_W <- PLOT_W - MARGIN_L - MARGIN_R
+INNER_H <- PLOT_H - MARGIN_T - MARGIN_B
+
 strip_species_prefix <- function(x) {
   x %>%
     as.character() %>%
-    # normalize NBSP -> space, squish first so regex is stable
     stringr::str_replace_all("[\u00A0]", " ") %>%
     stringr::str_squish() %>%
-    # remove leading "Homo sapiens:" (any capitalization, optional spaces around colon)
-    stringr::str_replace(regex("^homo\\s+sapiens\\s*:\\s*", ignore_case = TRUE), "") %>%
-    # in case there are multiple prefixes (rare), remove repeatedly
-    stringr::str_replace(regex("^homo\\s+sapiens\\s*:\\s*", ignore_case = TRUE), "") %>%
+    stringr::str_replace(
+      stringr::regex("^homo\\s+sapiens\\s*:\\s*", ignore_case = TRUE),
+      ""
+    ) %>%
     stringr::str_squish()
 }
 
-# --- Pathway normalization helpers (KEY FIX) ---
 normalize_pathway <- function(x) {
   x %>%
-    strip_species_prefix() %>%                 # <-- apply prefix removal BEFORE key
-    stringr::str_to_lower()                    # case-insensitive key
+    strip_species_prefix() %>%
+    stringr::str_to_lower() %>%
+    stringr::str_squish()
 }
 
 pretty_pathway <- function(key) {
-  # key is already lower; convert to Title for display
-  stringr::str_to_title(key)
+  key %>%
+    stringr::str_to_title() %>%
+    stringr::str_replace_all("\\bRrna\\b", "rRNA")   %>%
+    stringr::str_replace_all("\\bMrna\\b", "mRNA")   %>%
+    stringr::str_replace_all("\\bTrna\\b", "tRNA")   %>%
+    stringr::str_replace_all("\\bSnrna\\b", "snRNA") %>%
+    stringr::str_replace_all("\\bMirna\\b", "miRNA") %>%
+    stringr::str_replace_all("\\bDna\\b", "DNA")     %>%
+    stringr::str_replace_all("\\bEcm-Receptor\\b", "ECM-Receptor")
+}
+
+escape_regex <- function(x) {
+  stringr::str_replace_all(
+    x,
+    "([\\^$.|?*+(){}\\[\\]\\\\])",
+    "\\\\\\1"
+  )
 }
 
 global_keywords <- c(
-  # Metabolism
   "amino acid metabolism", "translation initiation", "rrna processing",
   "mitochondrial translation", "lipid metabolism", "carbohydrate metabolism",
   "central carbon metabolism", "nucleotide metabolism", "glucose metabolism",
@@ -2790,92 +2872,105 @@ global_keywords <- c(
   "beta oxidation", "fatty acid degradation", "steroid metabolism",
   "cholesterol metabolism", "glutathione metabolism", "methionine metabolism",
   "polyamine metabolism", "biosynthesis of amino acids",
-  
-  # Signaling
   "wnt signaling", "mapk signaling", "interleukin signaling", "tnf signaling",
   "jak-stat signaling", "tgf-beta signaling", "interferon signaling",
   "notch signaling", "egfr signaling", "hif-1 signaling", "tp53 signaling",
   "tcr signaling", "b cell receptor", "chemokine signaling",
-  
-  # Stress & Apoptosis
   "upr", "autophagy", "apoptosis", "programmed cell death",
   "cellular senescence", "hypoxia response", "dna repair", "dna replication",
   "mitotic cell cycle", "cell cycle checkpoints",
-  
-  # Immune / Matrix / Transport
   "neutrophil degranulation", "extracellular matrix", "platelet activation",
   "lysosome", "endosome", "vesicle-mediated transport", "deubiquitination",
   "proteolysis", "biological oxidations", "organelle biogenesis",
   "ecm-receptor interaction",
-  
-  # Development / Morphogenesis
   "gastrulation", "somitogenesis", "chromatin organization", "histone modification",
-  
-  # Reproduction-specific
   "oocyte", "spermatogenesis", "meiosis", "gamete generation",
   "gonad development", "reproductive system", "reproductive development",
-  "sexual reproduction", "fertilization", "androgen", "estrogen", "luteinizing hormone",
-  "follicle-stimulating hormone", "hormone signaling"
+  "sexual reproduction", "fertilization", "androgen", "estrogen",
+  "luteinizing hormone", "follicle-stimulating hormone", "hormone signaling"
 )
 
 file_pattern <- "^Fisher_(GO|KEGG|Reactome)_(T\\d+)_up_(T\\d+)_down_(T\\d+_vs_T\\d+)_annotated\\.xlsx$"
 
-# --- Helper: Read Fisher and tidy ---
 read_and_tidy <- function(filepath) {
-  bn <- basename(filepath)
-  m  <- stringr::str_match(bn, file_pattern)
+  bn <- base::basename(filepath)
+  m <- stringr::str_match(bn, file_pattern)
+  
   if (any(is.na(m))) {
-    cat("⚠️  Skipping unmatched filename: ", bn, "\n")
+    cat("⚠️ Skipping unmatched filename:", bn, "\n")
     return(NULL)
   }
   
-  src       <- m[2]
-  first_tp  <- m[3]
-  second_tp <- m[4]
-  comp      <- m[5]
-  side      <- if (startsWith(comp, first_tp)) "First" else "Second"
-  up_in     <- first_tp
+  src      <- m[2]
+  first_tp <- m[3]
+  comp     <- m[5]
+  side     <- if (startsWith(comp, first_tp)) "First" else "Second"
+  up_in    <- first_tp
   
-  df <- tryCatch(openxlsx::read.xlsx(filepath), error = function(e) NULL)
+  df <- tryCatch(
+    openxlsx::read.xlsx(filepath),
+    error = function(e) NULL
+  )
+  
   if (is.null(df)) {
-    cat("❌ Could not read file: ", bn, "\n")
+    cat("❌ Could not read:", bn, "\n")
     return(NULL)
   }
   
-  gene_col <- if ("Genes" %in% names(df)) "Genes" else if ("Gene" %in% names(df)) "Gene" else NA_character_
+  gene_col <- if ("Genes" %in% names(df)) {
+    "Genes"
+  } else if ("Gene" %in% names(df)) {
+    "Gene"
+  } else {
+    NA_character_
+  }
+  
   if (is.na(gene_col) || !"Pathway" %in% names(df)) {
-    cat("⚠️  File lacks Pathway or Gene(s): ", bn, "\n")
+    cat("⚠️ File lacks Pathway or Gene(s):", bn, "\n")
     return(NULL)
   }
   
-  if ("p_adj" %in% names(df)) df$p_adj <- suppressWarnings(as.numeric(df$p_adj)) else df$p_adj <- NA_real_
+  if ("p_adj" %in% names(df)) {
+    df$p_adj <- suppressWarnings(as.numeric(df$p_adj))
+  } else {
+    df$p_adj <- NA_real_
+  }
   
   df2 <- df %>%
     dplyr::mutate(
-      Source = src, Up_in = up_in, Side = side, Comparison = comp,
+      Source = src,
+      Up_in = up_in,
+      Side = side,
+      Comparison = comp,
       Pathway_raw = stringr::str_squish(as.character(Pathway)),
-      Pathway = strip_species_prefix(Pathway_raw),      # <-- display-cleaned pathway
-      Pathway_key  = normalize_pathway(Pathway_raw),    # <-- key-cleaned pathway
+      Pathway = strip_species_prefix(Pathway_raw),
+      Pathway_key = normalize_pathway(Pathway_raw),
       Pathway_disp = pretty_pathway(Pathway_key)
     ) %>%
     dplyr::filter(!is.na(.data[[gene_col]]), .data[[gene_col]] != "") %>%
     dplyr::filter(
-      !is.na(Pathway_key), Pathway_key != "",
+      !is.na(Pathway_key),
+      Pathway_key != "",
       !(Pathway_key %in% c("na", "na | na | na"))
     )
   
-  if (nrow(df2) == 0) {
-    cat("⚠️  File has no usable rows after filter: ", bn, "\n")
-    return(NULL)
-  }
-  
-  # keyword filter: apply to normalized key to avoid missing due to case
   if (!is.null(global_keywords) && length(global_keywords) > 0) {
-    pat <- paste0("(", paste0(global_keywords, collapse = "|"), ")")
+    keyword_pattern <- paste0(
+      "(",
+      paste0(escape_regex(stringr::str_to_lower(global_keywords)), collapse = "|"),
+      ")"
+    )
+    
     df2 <- df2 %>%
-      dplyr::filter(stringr::str_detect(Pathway_key, stringr::str_to_lower(pat)))
+      dplyr::filter(
+        stringr::str_detect(
+          Pathway_key,
+          stringr::regex(keyword_pattern, ignore_case = TRUE)
+        )
+      )
+    
     if (nrow(df2) == 0) {
-      cat("⚠️  No keyword-matched pathways in: ", bn, "\n")
+      cat("⚠️ No keyword-matched pathways in:", bn, "\n")
       return(NULL)
     }
   }
@@ -2884,53 +2979,77 @@ read_and_tidy <- function(filepath) {
     tidyr::separate_rows(.data[[gene_col]], sep = "[;,/\\s]+") %>%
     dplyr::mutate(Gene = stringr::str_trim(.data[[gene_col]])) %>%
     dplyr::filter(Gene != "") %>%
-    dplyr::distinct(Pathway_key, Pathway_disp, Gene, Up_in, Side, Source, Comparison, p_adj)
+    dplyr::distinct(
+      Pathway_key,
+      Pathway_disp,
+      Gene,
+      Up_in,
+      Side,
+      Source,
+      Comparison,
+      p_adj
+    ) %>%
+    dplyr::mutate(Timepoint = factor(Up_in, levels = timepoints))
   
   if (nrow(df_long) == 0) {
-    cat("⚠️  No usable long-form rows: ", bn, "\n")
+    cat("⚠️ No usable long-form rows:", bn, "\n")
     return(NULL)
   }
   
-  df_long <- df_long %>%
-    dplyr::mutate(Timepoint = factor(Up_in, levels = timepoints))
-  
-  return(df_long)
+  df_long
 }
 
-# --- Load Fisher files ---
 cat("🔎 Scanning all Fisher enrichment files...\n")
+
 all_fisher_dirs <- list.dirs(volcano_root, recursive = TRUE, full.names = TRUE)
-fdirs <- all_fisher_dirs[grepl(paste0(.Platform$file.sep, "Fisher$"), all_fisher_dirs)]
-if (length(fdirs) == 0) stop("❌ No Fisher folders found under: ", volcano_root)
-for (d in fdirs) cat("   Scanning:", normalizePath(d), "\n")
+fdirs <- all_fisher_dirs[
+  grepl(paste0(.Platform$file.sep, "Fisher$"), all_fisher_dirs)
+]
+
+if (length(fdirs) == 0) {
+  stop("❌ No Fisher folders found under: ", volcano_root)
+}
+
+for (d in fdirs) {
+  cat("   Scanning:", normalizePath(d), "\n")
+}
 
 all_rows <- list()
+
 for (d in fdirs) {
   files <- list.files(d, pattern = file_pattern, full.names = TRUE)
+  
   if (length(files) == 0) next
+  
   for (f in files) {
     r <- read_and_tidy(f)
-    if (!is.null(r)) all_rows[[length(all_rows) + 1]] <- r
+    
+    if (!is.null(r)) {
+      all_rows[[length(all_rows) + 1]] <- r
+    }
   }
 }
-if (length(all_rows) == 0) stop("❌ No enrichment rows collected. Check file names, contents or keyword filter.")
+
+if (length(all_rows) == 0) {
+  stop("❌ No enrichment rows collected. Check filenames, contents, or keyword filter.")
+}
+
 dat <- dplyr::bind_rows(all_rows)
 
-# --- Deduplicate (USING Pathway_key) ---
 dat <- dat %>%
-  dplyr::group_by(Pathway_key, Pathway_disp, Gene, Timepoint, Side, Source, Comparison) %>%
+  dplyr::group_by(
+    Pathway_key,
+    Pathway_disp,
+    Gene,
+    Timepoint,
+    Side,
+    Source,
+    Comparison
+  ) %>%
   dplyr::summarise(
     p_adj = ifelse(all(is.na(p_adj)), NA_real_, min(p_adj, na.rm = TRUE)),
     .groups = "drop"
   )
-
-# ----------------------------------------------------------
-# TIMEPOINT-SPECIFIC SELECTION
-# 1) Compute pathway stats per timepoint
-# 2) Apply MIN_PROTEINS and FDR_CUTOFF
-# 3) Pick TOP_N per timepoint
-# 4) Keep ONLY those Pathway_key + Timepoint combinations in the Sankey
-# ----------------------------------------------------------
 
 path_stats_tp <- dat %>%
   dplyr::group_by(Pathway_key, Timepoint) %>%
@@ -2940,12 +3059,18 @@ path_stats_tp <- dat %>%
     Pathway_disp = dplyr::first(Pathway_disp),
     .groups = "drop"
   ) %>%
-  dplyr::filter(gene_count >= MIN_PROTEINS, !is.na(min_p), min_p < FDR_CUTOFF) %>%
-  dplyr::mutate(tp_num = as.numeric(stringr::str_replace(Timepoint, "T", "")))
+  dplyr::filter(
+    gene_count >= MIN_PROTEINS,
+    !is.na(min_p),
+    min_p < FDR_CUTOFF
+  ) %>%
+  dplyr::mutate(
+    tp_num = as.numeric(stringr::str_replace(as.character(Timepoint), "T", ""))
+  )
 
 top_tp <- path_stats_tp %>%
   dplyr::group_by(Timepoint) %>%
-  dplyr::arrange(desc(gene_count), min_p) %>%
+  dplyr::arrange(desc(gene_count), min_p, .by_group = TRUE) %>%
   dplyr::slice_head(n = TOP_N) %>%
   dplyr::ungroup()
 
@@ -2953,147 +3078,892 @@ tp_selected <- top_tp %>%
   dplyr::select(Timepoint, Pathway_key) %>%
   dplyr::distinct()
 
-cat(sprintf("✅ Selected up to %d pathways per timepoint after filters (FDR<%.3g, proteins>=%d).\n",
-            TOP_N, FDR_CUTOFF, MIN_PROTEINS))
+cat(sprintf(
+  "✅ Selected up to %d pathways per timepoint after filters FDR < %.3g, proteins >= %d.\n",
+  TOP_N,
+  FDR_CUTOFF,
+  MIN_PROTEINS
+))
 
-# Keep only rows where pathway was selected for THAT timepoint
 dat_sel <- dat %>%
   dplyr::inner_join(tp_selected, by = c("Timepoint", "Pathway_key"))
 
-# Node ordering: by timepoint then strength
 pathways_ordered_disp <- top_tp %>%
   dplyr::arrange(tp_num, desc(gene_count), min_p) %>%
   dplyr::pull(Pathway_disp) %>%
   unique()
 
-# --- Sankey weighting (your style), now inherently timepoint-specific ---
 path_counts <- dat_sel %>%
   dplyr::group_by(Pathway_key) %>%
-  dplyr::summarise(n_link = dplyr::n_distinct(Timepoint), .groups = "drop")
+  dplyr::summarise(
+    n_link = dplyr::n_distinct(Timepoint),
+    .groups = "drop"
+  )
 
 dat_w <- dat_sel %>%
   dplyr::left_join(path_counts, by = "Pathway_key") %>%
-  dplyr::group_by(Pathway_key, Pathway_disp, Timepoint, Side, Comparison) %>%
+  dplyr::group_by(
+    Pathway_key,
+    Pathway_disp,
+    Timepoint,
+    Side,
+    Comparison
+  ) %>%
   dplyr::summarise(
     weight = sum(1 / ifelse(is.na(n_link) | n_link == 0, 1, n_link)),
     .groups = "drop"
   ) %>%
-  dplyr::mutate(Timepoint = factor(as.character(Timepoint), levels = timepoints))
+  dplyr::mutate(
+    Timepoint = factor(as.character(Timepoint), levels = timepoints)
+  )
 
-# --- Sankey plot function ---
 plot_tp_specific_sankey <- function(df, label, outdir, pathways_disp_ordered) {
   if (is.null(df) || nrow(df) == 0) {
-    cat("❌ No data for ", label, "\n")
+    cat("❌ No data for", label, "\n")
     return(NULL)
   }
   
-  pathways  <- pathways_disp_ordered
+  pathways <- pathways_disp_ordered
   tps_order <- timepoints
   
-  nodes <- rbind(
-    data.frame(name = pathways, type = "Pathway", stringsAsFactors = FALSE),
-    data.frame(name = tps_order,  type = "Timepoint", stringsAsFactors = FALSE)
+  nodes <- dplyr::bind_rows(
+    data.frame(
+      name = pathways,
+      type = "Pathway",
+      stringsAsFactors = FALSE
+    ),
+    data.frame(
+      name = tps_order,
+      type = "Timepoint",
+      stringsAsFactors = FALSE
+    )
   )
   
   df <- df %>%
     dplyr::mutate(
       Pathway_disp = factor(Pathway_disp, levels = pathways),
-      Timepoint    = factor(Timepoint, levels = tps_order)
+      Timepoint = factor(Timepoint, levels = tps_order)
     )
   
   links <- df %>%
     dplyr::mutate(
       source = match(as.character(Pathway_disp), nodes$name) - 1,
-      target = match(as.character(Timepoint),    nodes$name) - 1,
-      value  = weight,
-      group  = as.character(Timepoint)
+      target = match(as.character(Timepoint), nodes$name) - 1,
+      value = weight,
+      group = as.character(Timepoint)
     ) %>%
+    dplyr::filter(!is.na(source), !is.na(target), value > 0) %>%
     dplyr::select(source, target, value, group)
   
-  # Keep missing timepoints visible (layout stabilizer)
   missing_tps <- setdiff(tps_order, unique(as.character(df$Timepoint)))
-  if (length(missing_tps) > 0) {
+  
+  if (length(missing_tps) > 0 && length(pathways) > 0) {
     dummy_links <- data.frame(
       source = 0,
       target = match(missing_tps, nodes$name) - 1,
-      value  = 0.0001,
-      group  = missing_tps,
+      value = 0.0001,
+      group = missing_tps,
       stringsAsFactors = FALSE
     )
+    
     links <- dplyr::bind_rows(links, dummy_links)
   }
   
   js_colors <- sprintf(
-    'd3.scaleOrdinal().domain(%s).range(%s)',
-    jsonlite::toJSON(timepoints),
-    jsonlite::toJSON(unname(tp_colors))
+    "d3.scaleOrdinal().domain(%s).range(%s)",
+    jsonlite::toJSON(timepoints, auto_unbox = TRUE),
+    jsonlite::toJSON(unname(tp_colors), auto_unbox = TRUE)
   )
   
-  sankey <- sankeyNetwork(
+  sankey <- networkD3::sankeyNetwork(
     Links = links,
     Nodes = nodes,
     Source = "source",
     Target = "target",
-    Value  = "value",
+    Value = "value",
     NodeID = "name",
-    fontSize = 36,
-    nodeWidth = 36,
-    sinksRight = TRUE,
+    NodeGroup = "type",
     LinkGroup = "group",
     colourScale = js_colors,
-    width = 1200, height = 800,
-    nodePadding = 20,
+    fontSize = 24,
+    fontFamily = "Arial",
+    nodeWidth = 28,
+    nodePadding = 14,
+    sinksRight = TRUE,
+    width = INNER_W,
+    height = INNER_H,
     iterations = 0
   )
   
-  outfile <- file.path(outdir, paste0("Sankey_", label, ".html"))
-  htmlwidgets::saveWidget(sankey, file = outfile, selfcontained = TRUE, background = "#fff")
+  pathway_json <- jsonlite::toJSON(pathways, auto_unbox = TRUE)
+  timepoint_json <- jsonlite::toJSON(tps_order, auto_unbox = TRUE)
   
-  # CSS to remove node rectangles and center text
-  lines <- readLines(outfile, warn = FALSE)
-  css_patch <- '
+  sankey <- htmlwidgets::onRender(
+    sankey,
+    sprintf(
+      "
+      function(el, x) {
+        var pathways = %s;
+        var timepoints = %s;
+
+        d3.select(el)
+          .style('display', 'flex')
+          .style('justify-content', 'center')
+          .style('align-items', 'center')
+          .style('width', '%dpx')
+          .style('height', '%dpx')
+          .style('background', '#ffffff')
+          .style('overflow', 'visible');
+
+        var svg = d3.select(el).select('svg');
+
+        svg
+          .attr('width', %d)
+          .attr('height', %d)
+          .attr('viewBox', '0 0 %d %d')
+          .attr('preserveAspectRatio', 'xMidYMid meet')
+          .style('display', 'block')
+          .style('margin', '0 auto')
+          .style('background', '#ffffff')
+          .style('overflow', 'visible');
+
+        var g = svg.select('g');
+
+        if (!g.empty()) {
+          g.attr('transform', 'translate(%d,%d)');
+        }
+
+        d3.select(el).selectAll('.node rect')
+          .style('fill', 'none')
+          .style('stroke', 'none');
+
+        d3.select(el).selectAll('.node text')
+          .style('font-weight', 'plain')
+          .style('fill', '#222')
+          .style('font-size', '24px');
+
+        d3.select(el).selectAll('.node')
+          .each(function(d) {
+            var txt = d3.select(this).select('text');
+
+            if (pathways.indexOf(d.name) >= 0) {
+              txt
+                .attr('text-anchor', 'end')
+                .attr('x', -1)
+                .attr('dy', '.35em')
+                .style('text-anchor', 'end');
+            }
+
+            if (timepoints.indexOf(d.name) >= 0) {
+              txt
+                .attr('text-anchor', 'start')
+                .attr('x', d.dx + 1)
+                .attr('dy', '.35em')
+                .style('text-anchor', 'start');
+            }
+          });
+      }
+      ",
+      pathway_json,
+      timepoint_json,
+      PLOT_W,
+      PLOT_H,
+      PLOT_W,
+      PLOT_H,
+      PLOT_W,
+      PLOT_H,
+      MARGIN_L,
+      MARGIN_T
+    )
+  )
+  
+  outfile <- file.path(outdir, paste0("Sankey_", label, ".html"))
+  
+  htmlwidgets::saveWidget(
+    sankey,
+    file = outfile,
+    selfcontained = TRUE,
+    background = "#fff"
+  )
+  
+  css_patch <- sprintf(
+    "
 <style>
-.node rect { fill: none !important; stroke: none !important; }
-.node text {
-  font-weight: bold;
-  fill: #222;
-  text-anchor: middle !important;
-  x: 0 !important;
-  transform: none !important;
-  font-size: 32px !important;
+body, html {
+  background: #fff !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  width: %dpx !important;
+  height: %dpx !important;
+  overflow: hidden !important;
 }
-body, html { background: #fff !important; }
+
+.html-widget,
+.sankeyNetwork {
+  margin: 0 auto !important;
+  overflow: visible !important;
+}
 </style>
-'
-idx <- grep("</head>", lines, fixed = TRUE)
-if (length(idx) > 0) {
-  lines <- append(lines, css_patch, after = idx[1] - 1)
-  writeLines(lines, outfile)
+",
+PLOT_W,
+PLOT_H
+  )
+  
+  lines <- readLines(outfile, warn = FALSE)
+  idx <- grep("</head>", lines, fixed = TRUE)
+  
+  if (length(idx) > 0) {
+    lines <- append(lines, css_patch, after = idx[1] - 1)
+    writeLines(lines, outfile)
+  }
+  
+  cat("✅ Saved Sankey HTML:", outfile, "\n")
+  
+  outfile_png <- file.path(outdir, paste0("Sankey_", label, ".png"))
+  
+  webshot2::webshot(
+    url = outfile,
+    file = outfile_png,
+    vwidth = PLOT_W,
+    vheight = PLOT_H,
+    delay = 3,
+    zoom = 4
+  )
+  
+  cat("✅ Also saved as PNG:", outfile_png, "\n")
+  
+  invisible(sankey)
 }
 
-cat("✅ Saved Sankey HTML: ", outfile, "\n")
-
-outfile_png <- file.path(outdir, paste0("Sankey_", label, ".png"))
-webshot2::webshot(
-  url = outfile,
-  file = outfile_png,
-  vwidth = 1200,
-  vheight = 750,
-  delay = 3,
-  zoom = 4
+out_root <- file.path(
+  volcano_root,
+  "Sankey_TopN_TimepointSpecific_T1toT10_Manuscript_Centered"
 )
-cat("✅ Also saved as PNG: ", outfile_png, "\n")
 
-invisible(sankey)
+if (!dir.exists(out_root)) {
+  dir.create(out_root, recursive = TRUE, showWarnings = FALSE)
 }
 
-# --- Output directory and plot ---
-out_root <- file.path(volcano_root, "Sankey_TopN_TimepointSpecific_T1toT10_Manuscript_NoSpeciesPrefix")
-if (!dir.exists(out_root)) dir.create(out_root, recursive = TRUE, showWarnings = FALSE)
+cat("🔎 Plotting timepoint-specific top pathways per timepoint...\n")
 
-cat("🔎 Plotting Timepoint-specific Top pathways per Timepoint...\n")
-plot_tp_specific_sankey(dat_w, paste0("Top", TOP_N, "_PerTimepoint_T1toT10"), out_root, pathways_ordered_disp)
+plot_tp_specific_sankey(
+  dat_w,
+  paste0("Top", TOP_N, "_PerTimepoint_T1toT10"),
+  out_root,
+  pathways_ordered_disp
+)
 
-cat("\n🎉 Sankey plot (Timepoint-specific, T1–T10, keyword-filtered, FDR<0.01 & proteins>=MIN_PROTEINS) saved in:\n",
-    normalizePath(out_root), "\n")
+cat(
+  "\n🎉 Sankey plot saved in:\n",
+  normalizePath(out_root),
+  "\n"
+)
+
+cat("🎉 Done.\n")
+
+
+################################################################################
+
+# ----------------------------------------------------------
+# Volcano Sankey: Overall Top N Pathways Across T1-T10
+# Margin-safe version using package::function
+# ----------------------------------------------------------
+
+suppressPackageStartupMessages({
+  library(dplyr)
+  library(tidyr)
+  library(stringr)
+  library(openxlsx)
+  library(RColorBrewer)
+  library(networkD3)
+  library(htmlwidgets)
+  library(webshot2)
+  library(jsonlite)
+})
+
+cat("🔎 Starting Volcano Sankey: Overall Top N Across T1-T10\n")
+
+volcano_root <- file.path(getwd(), "Volcano_Results_limma_BH")
+if (!dir.exists(volcano_root)) stop("❌ Folder not found: ", volcano_root)
+
+timepoints <- paste0("T", 1:10)
+tp_colors <- RColorBrewer::brewer.pal(10, "Paired")
+names(tp_colors) <- timepoints
+
+FDR_CUTOFF   <- 0.01
+MIN_PROTEINS <- 5
+TOP_N        <- 20
+
+PLOT_W <- 1500
+PLOT_H <- 750
+
+MARGIN_L <- 800
+MARGIN_R <- 140
+MARGIN_T <- 40
+MARGIN_B <- 40
+
+INNER_W <- PLOT_W - MARGIN_L - MARGIN_R
+INNER_H <- PLOT_H - MARGIN_T - MARGIN_B
+
+strip_species_prefix <- function(x) {
+  x %>%
+    as.character() %>%
+    stringr::str_replace_all("[\u00A0]", " ") %>%
+    stringr::str_squish() %>%
+    stringr::str_replace(
+      stringr::regex("^homo\\s+sapiens\\s*:\\s*", ignore_case = TRUE),
+      ""
+    ) %>%
+    stringr::str_squish()
+}
+
+normalize_pathway <- function(x) {
+  x %>%
+    strip_species_prefix() %>%
+    stringr::str_to_lower() %>%
+    stringr::str_squish()
+}
+
+pretty_pathway <- function(key) {
+  key %>%
+    stringr::str_to_title() %>%
+    stringr::str_replace_all("\\bRrna\\b", "rRNA")   %>%
+    stringr::str_replace_all("\\bMrna\\b", "mRNA")   %>%
+    stringr::str_replace_all("\\bTrna\\b", "tRNA")   %>%
+    stringr::str_replace_all("\\bSnrna\\b", "snRNA") %>%
+    stringr::str_replace_all("\\bMirna\\b", "miRNA") %>%
+    stringr::str_replace_all("\\bDna\\b", "DNA")     %>%
+    stringr::str_replace_all("\\bEcm-Receptor\\b", "ECM-Receptor")
+}
+
+escape_regex <- function(x) {
+  stringr::str_replace_all(
+    x,
+    "([\\^$.|?*+(){}\\[\\]\\\\])",
+    "\\\\\\1"
+  )
+}
+
+global_keywords <- c(
+  "amino acid metabolism", "translation initiation", "rrna processing",
+  "mitochondrial translation", "lipid metabolism", "carbohydrate metabolism",
+  "central carbon metabolism", "nucleotide metabolism", "glucose metabolism",
+  "pyruvate metabolism", "citrate cycle (tca cycle)", "glycolysis", "gluconeogenesis",
+  "beta oxidation", "fatty acid degradation", "steroid metabolism",
+  "cholesterol metabolism", "glutathione metabolism", "methionine metabolism",
+  "polyamine metabolism", "biosynthesis of amino acids",
+  "wnt signaling", "mapk signaling", "interleukin signaling", "tnf signaling",
+  "jak-stat signaling", "tgf-beta signaling", "interferon signaling",
+  "notch signaling", "egfr signaling", "hif-1 signaling", "tp53 signaling",
+  "tcr signaling", "b cell receptor", "chemokine signaling",
+  "upr", "autophagy", "apoptosis", "programmed cell death",
+  "cellular senescence", "hypoxia response", "dna repair", "dna replication",
+  "mitotic cell cycle", "cell cycle checkpoints",
+  "neutrophil degranulation", "extracellular matrix", "platelet activation",
+  "lysosome", "endosome", "vesicle-mediated transport", "deubiquitination",
+  "proteolysis", "biological oxidations", "organelle biogenesis",
+  "ecm-receptor interaction",
+  "gastrulation", "somitogenesis", "chromatin organization", "histone modification",
+  "oocyte", "spermatogenesis", "meiosis", "gamete generation",
+  "gonad development", "reproductive system", "reproductive development",
+  "sexual reproduction", "fertilization", "androgen", "estrogen",
+  "luteinizing hormone", "follicle-stimulating hormone", "hormone signaling"
+)
+
+file_pattern <- "^Fisher_(GO|KEGG|Reactome)_(T\\d+)_up_(T\\d+)_down_(T\\d+_vs_T\\d+)_annotated\\.xlsx$"
+
+read_and_tidy <- function(filepath) {
+  bn <- base::basename(filepath)
+  m <- stringr::str_match(bn, file_pattern)
+  
+  if (any(is.na(m))) {
+    cat("⚠️ Skipping unmatched filename:", bn, "\n")
+    return(NULL)
+  }
+  
+  src      <- m[2]
+  first_tp <- m[3]
+  comp     <- m[5]
+  side     <- if (startsWith(comp, first_tp)) "First" else "Second"
+  up_in    <- first_tp
+  
+  df <- tryCatch(
+    openxlsx::read.xlsx(filepath),
+    error = function(e) NULL
+  )
+  
+  if (is.null(df)) {
+    cat("❌ Could not read:", bn, "\n")
+    return(NULL)
+  }
+  
+  gene_col <- if ("Genes" %in% names(df)) {
+    "Genes"
+  } else if ("Gene" %in% names(df)) {
+    "Gene"
+  } else {
+    NA_character_
+  }
+  
+  if (is.na(gene_col) || !"Pathway" %in% names(df)) {
+    cat("⚠️ File lacks Pathway or Gene(s):", bn, "\n")
+    return(NULL)
+  }
+  
+  if ("p_adj" %in% names(df)) {
+    df$p_adj <- suppressWarnings(as.numeric(df$p_adj))
+  } else {
+    df$p_adj <- NA_real_
+  }
+  
+  df2 <- df %>%
+    dplyr::mutate(
+      Source = src,
+      Up_in = up_in,
+      Side = side,
+      Comparison = comp,
+      Pathway_raw = stringr::str_squish(as.character(Pathway)),
+      Pathway = strip_species_prefix(Pathway_raw),
+      Pathway_key = normalize_pathway(Pathway_raw),
+      Pathway_disp = pretty_pathway(Pathway_key)
+    ) %>%
+    dplyr::filter(!is.na(.data[[gene_col]]), .data[[gene_col]] != "") %>%
+    dplyr::filter(
+      !is.na(Pathway_key),
+      Pathway_key != "",
+      !(Pathway_key %in% c("na", "na | na | na"))
+    )
+  
+  if (!is.null(global_keywords) && length(global_keywords) > 0) {
+    keyword_pattern <- paste0(
+      "(",
+      paste0(escape_regex(stringr::str_to_lower(global_keywords)), collapse = "|"),
+      ")"
+    )
+    
+    df2 <- df2 %>%
+      dplyr::filter(
+        stringr::str_detect(
+          Pathway_key,
+          stringr::regex(keyword_pattern, ignore_case = TRUE)
+        )
+      )
+    
+    if (nrow(df2) == 0) {
+      cat("⚠️ No keyword-matched pathways in:", bn, "\n")
+      return(NULL)
+    }
+  }
+  
+  df_long <- df2 %>%
+    tidyr::separate_rows(.data[[gene_col]], sep = "[;,/\\s]+") %>%
+    dplyr::mutate(Gene = stringr::str_trim(.data[[gene_col]])) %>%
+    dplyr::filter(Gene != "") %>%
+    dplyr::distinct(
+      Pathway_key,
+      Pathway_disp,
+      Gene,
+      Up_in,
+      Side,
+      Source,
+      Comparison,
+      p_adj
+    ) %>%
+    dplyr::mutate(Timepoint = factor(Up_in, levels = timepoints))
+  
+  if (nrow(df_long) == 0) {
+    cat("⚠️ No usable long-form rows:", bn, "\n")
+    return(NULL)
+  }
+  
+  df_long
+}
+
+cat("🔎 Scanning all Fisher enrichment files...\n")
+
+all_fisher_dirs <- list.dirs(volcano_root, recursive = TRUE, full.names = TRUE)
+fdirs <- all_fisher_dirs[
+  grepl(paste0(.Platform$file.sep, "Fisher$"), all_fisher_dirs)
+]
+
+if (length(fdirs) == 0) {
+  stop("❌ No Fisher folders found under: ", volcano_root)
+}
+
+for (d in fdirs) {
+  cat("   Scanning:", normalizePath(d), "\n")
+}
+
+all_rows <- list()
+
+for (d in fdirs) {
+  files <- list.files(d, pattern = file_pattern, full.names = TRUE)
+  
+  if (length(files) == 0) next
+  
+  for (f in files) {
+    r <- read_and_tidy(f)
+    
+    if (!is.null(r)) {
+      all_rows[[length(all_rows) + 1]] <- r
+    }
+  }
+}
+
+if (length(all_rows) == 0) {
+  stop("❌ No enrichment rows collected. Check filenames, contents, or keyword filter.")
+}
+
+dat <- dplyr::bind_rows(all_rows)
+
+dat <- dat %>%
+  dplyr::group_by(
+    Pathway_key,
+    Pathway_disp,
+    Gene,
+    Timepoint,
+    Side,
+    Source,
+    Comparison
+  ) %>%
+  dplyr::summarise(
+    p_adj = ifelse(all(is.na(p_adj)), NA_real_, min(p_adj, na.rm = TRUE)),
+    .groups = "drop"
+  )
+
+path_stats_tp <- dat %>%
+  dplyr::group_by(Pathway_key, Timepoint) %>%
+  dplyr::summarise(
+    min_p = ifelse(all(is.na(p_adj)), NA_real_, min(p_adj, na.rm = TRUE)),
+    gene_count = dplyr::n_distinct(Gene),
+    Pathway_disp = dplyr::first(Pathway_disp),
+    .groups = "drop"
+  ) %>%
+  dplyr::filter(
+    gene_count >= MIN_PROTEINS,
+    !is.na(min_p),
+    min_p < FDR_CUTOFF
+  ) %>%
+  dplyr::mutate(
+    tp_num = as.numeric(stringr::str_replace(as.character(Timepoint), "T", ""))
+  )
+
+# ----------------------------------------------------------
+# CHANGED PART:
+# Select overall top N pathways across all T1-T10,
+# instead of selecting top N separately per timepoint.
+# ----------------------------------------------------------
+
+top_overall_keys <- path_stats_tp %>%
+  dplyr::group_by(Pathway_key) %>%
+  dplyr::summarise(
+    overall_gene_count = max(gene_count, na.rm = TRUE),
+    overall_min_p = min(min_p, na.rm = TRUE),
+    Pathway_disp = dplyr::first(Pathway_disp),
+    .groups = "drop"
+  ) %>%
+  dplyr::arrange(desc(overall_gene_count), overall_min_p) %>%
+  dplyr::slice_head(n = TOP_N) %>%
+  dplyr::select(Pathway_key)
+
+top_tp <- path_stats_tp %>%
+  dplyr::inner_join(top_overall_keys, by = "Pathway_key")
+
+tp_selected <- top_tp %>%
+  dplyr::select(Timepoint, Pathway_key) %>%
+  dplyr::distinct()
+
+cat(sprintf(
+  "✅ Selected overall top %d pathways after filters FDR < %.3g, proteins >= %d.\n",
+  TOP_N,
+  FDR_CUTOFF,
+  MIN_PROTEINS
+))
+
+dat_sel <- dat %>%
+  dplyr::inner_join(tp_selected, by = c("Timepoint", "Pathway_key"))
+
+pathways_ordered_disp <- top_tp %>%
+  dplyr::group_by(Pathway_key, Pathway_disp) %>%
+  dplyr::summarise(
+    max_gene_count = max(gene_count, na.rm = TRUE),
+    min_p = min(min_p, na.rm = TRUE),
+    first_tp_num = min(tp_num, na.rm = TRUE),
+    .groups = "drop"
+  ) %>%
+  dplyr::arrange(desc(max_gene_count), min_p, first_tp_num) %>%
+  dplyr::pull(Pathway_disp) %>%
+  unique()
+
+path_counts <- dat_sel %>%
+  dplyr::group_by(Pathway_key) %>%
+  dplyr::summarise(
+    n_link = dplyr::n_distinct(Timepoint),
+    .groups = "drop"
+  )
+
+dat_w <- dat_sel %>%
+  dplyr::left_join(path_counts, by = "Pathway_key") %>%
+  dplyr::group_by(
+    Pathway_key,
+    Pathway_disp,
+    Timepoint,
+    Side,
+    Comparison
+  ) %>%
+  dplyr::summarise(
+    weight = sum(1 / ifelse(is.na(n_link) | n_link == 0, 1, n_link)),
+    .groups = "drop"
+  ) %>%
+  dplyr::mutate(
+    Timepoint = factor(as.character(Timepoint), levels = timepoints)
+  )
+
+plot_tp_specific_sankey <- function(df, label, outdir, pathways_disp_ordered) {
+  if (is.null(df) || nrow(df) == 0) {
+    cat("❌ No data for", label, "\n")
+    return(NULL)
+  }
+  
+  pathways <- pathways_disp_ordered
+  tps_order <- timepoints
+  
+  nodes <- dplyr::bind_rows(
+    data.frame(
+      name = pathways,
+      type = "Pathway",
+      stringsAsFactors = FALSE
+    ),
+    data.frame(
+      name = tps_order,
+      type = "Timepoint",
+      stringsAsFactors = FALSE
+    )
+  )
+  
+  df <- df %>%
+    dplyr::mutate(
+      Pathway_disp = factor(Pathway_disp, levels = pathways),
+      Timepoint = factor(Timepoint, levels = tps_order)
+    )
+  
+  links <- df %>%
+    dplyr::mutate(
+      source = match(as.character(Pathway_disp), nodes$name) - 1,
+      target = match(as.character(Timepoint), nodes$name) - 1,
+      value = weight,
+      group = as.character(Timepoint)
+    ) %>%
+    dplyr::filter(!is.na(source), !is.na(target), value > 0) %>%
+    dplyr::select(source, target, value, group)
+  
+  missing_tps <- setdiff(tps_order, unique(as.character(df$Timepoint)))
+  
+  if (length(missing_tps) > 0 && length(pathways) > 0) {
+    dummy_links <- data.frame(
+      source = 0,
+      target = match(missing_tps, nodes$name) - 1,
+      value = 0.0001,
+      group = missing_tps,
+      stringsAsFactors = FALSE
+    )
+    
+    links <- dplyr::bind_rows(links, dummy_links)
+  }
+  
+  js_colors <- sprintf(
+    "d3.scaleOrdinal().domain(%s).range(%s)",
+    jsonlite::toJSON(timepoints, auto_unbox = TRUE),
+    jsonlite::toJSON(unname(tp_colors), auto_unbox = TRUE)
+  )
+  
+  sankey <- networkD3::sankeyNetwork(
+    Links = links,
+    Nodes = nodes,
+    Source = "source",
+    Target = "target",
+    Value = "value",
+    NodeID = "name",
+    NodeGroup = "type",
+    LinkGroup = "group",
+    colourScale = js_colors,
+    fontSize = 24,
+    fontFamily = "Arial",
+    nodeWidth = 28,
+    nodePadding = 14,
+    sinksRight = TRUE,
+    width = INNER_W,
+    height = INNER_H,
+    iterations = 0
+  )
+  
+  pathway_json <- jsonlite::toJSON(pathways, auto_unbox = TRUE)
+  timepoint_json <- jsonlite::toJSON(tps_order, auto_unbox = TRUE)
+  
+  sankey <- htmlwidgets::onRender(
+    sankey,
+    sprintf(
+      "
+      function(el, x) {
+        var pathways = %s;
+        var timepoints = %s;
+
+        d3.select(el)
+          .style('display', 'flex')
+          .style('justify-content', 'center')
+          .style('align-items', 'center')
+          .style('width', '%dpx')
+          .style('height', '%dpx')
+          .style('background', '#ffffff')
+          .style('overflow', 'visible');
+
+        var svg = d3.select(el).select('svg');
+
+        svg
+          .attr('width', %d)
+          .attr('height', %d)
+          .attr('viewBox', '0 0 %d %d')
+          .attr('preserveAspectRatio', 'xMidYMid meet')
+          .style('display', 'block')
+          .style('margin', '0 auto')
+          .style('background', '#ffffff')
+          .style('overflow', 'visible');
+
+        var g = svg.select('g');
+
+        if (!g.empty()) {
+          g.attr('transform', 'translate(%d,%d)');
+        }
+
+        d3.select(el).selectAll('.node rect')
+          .style('fill', 'none')
+          .style('stroke', 'none');
+
+        d3.select(el).selectAll('.node text')
+          .style('font-weight', 'plain')
+          .style('fill', '#222')
+          .style('font-size', '24px');
+
+        d3.select(el).selectAll('.node')
+          .each(function(d) {
+            var txt = d3.select(this).select('text');
+
+            if (pathways.indexOf(d.name) >= 0) {
+              txt
+                .attr('text-anchor', 'end')
+                .attr('x', -1)
+                .attr('dy', '.35em')
+                .style('text-anchor', 'end');
+            }
+
+            if (timepoints.indexOf(d.name) >= 0) {
+              txt
+                .attr('text-anchor', 'start')
+                .attr('x', d.dx + 1)
+                .attr('dy', '.35em')
+                .style('text-anchor', 'start');
+            }
+          });
+      }
+      ",
+      pathway_json,
+      timepoint_json,
+      PLOT_W,
+      PLOT_H,
+      PLOT_W,
+      PLOT_H,
+      PLOT_W,
+      PLOT_H,
+      MARGIN_L,
+      MARGIN_T
+    )
+  )
+  
+  outfile <- file.path(outdir, paste0("Sankey_", label, ".html"))
+  
+  htmlwidgets::saveWidget(
+    sankey,
+    file = outfile,
+    selfcontained = TRUE,
+    background = "#fff"
+  )
+  
+  css_patch <- sprintf(
+    "
+<style>
+body, html {
+  background: #fff !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  width: %dpx !important;
+  height: %dpx !important;
+  overflow: hidden !important;
+}
+
+.html-widget,
+.sankeyNetwork {
+  margin: 0 auto !important;
+  overflow: visible !important;
+}
+</style>
+",
+PLOT_W,
+PLOT_H
+  )
+  
+  lines <- readLines(outfile, warn = FALSE)
+  idx <- grep("</head>", lines, fixed = TRUE)
+  
+  if (length(idx) > 0) {
+    lines <- append(lines, css_patch, after = idx[1] - 1)
+    writeLines(lines, outfile)
+  }
+  
+  cat("✅ Saved Sankey HTML:", outfile, "\n")
+  
+  outfile_png <- file.path(outdir, paste0("Sankey_", label, ".png"))
+  
+  webshot2::webshot(
+    url = outfile,
+    file = outfile_png,
+    vwidth = PLOT_W,
+    vheight = PLOT_H,
+    delay = 3,
+    zoom = 4
+  )
+  
+  cat("✅ Also saved as PNG:", outfile_png, "\n")
+  
+  invisible(sankey)
+}
+
+# ----------------------------------------------------------
+# CHANGED PART:
+# Save overall top N result in a separate folder.
+# ----------------------------------------------------------
+
+out_root <- file.path(
+  volcano_root,
+  "Sankey_OverallTopN_T1toT10_Manuscript_Centered"
+)
+
+if (!dir.exists(out_root)) {
+  dir.create(out_root, recursive = TRUE, showWarnings = FALSE)
+}
+
+cat("🔎 Plotting overall top pathways across T1-T10...\n")
+
+plot_tp_specific_sankey(
+  dat_w,
+  paste0("OverallTop", TOP_N, "_T1toT10"),
+  out_root,
+  pathways_ordered_disp
+)
+
+cat(
+  "\n🎉 Sankey plot saved in:\n",
+  normalizePath(out_root),
+  "\n"
+)
+
 cat("🎉 Done.\n")
